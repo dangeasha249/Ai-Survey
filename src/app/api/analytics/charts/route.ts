@@ -8,33 +8,124 @@ export async function GET() {
     const responses = await SurveyResponseModel.find().lean();
 
     const total = Math.max(responses.length, 1);
-    const courseMap: Record<string, number> = {};
 
-    responses.forEach((r) => {
-      const c = r.course || "Other";
-      courseMap[c] = (courseMap[c] || 0) + 1;
+    // 1. Responses by Course (Q1)
+    const courseMap: Record<string, number> = {
+      "B.Sc. CS": 0,
+      "B.Sc. IT": 0,
+      "BCA": 0,
+      "B.Com": 0,
+      "B.A.": 0,
+      "Others": 0,
+    };
+
+    responses.forEach((r: any) => {
+      const answers = r.surveyAnswers || {};
+      let c = answers.q1Course || r.course || "Others";
+      if (c === "B.Sc. Computer Science") c = "B.Sc. CS";
+      if (c === "B.Sc. Information Technology") c = "B.Sc. IT";
+      if (c === "Other") c = "Others";
+
+      if (courseMap[c] !== undefined) {
+        courseMap[c] += 1;
+      } else {
+        courseMap["Others"] += 1;
+      }
     });
 
-    const totalCourseSum = Object.values(courseMap).reduce((a, b) => a + b, 0);
+    const totalCourseSum = Object.values(courseMap).reduce((a, b) => a + b, 0) || 1;
     const courseDistribution = Object.entries(courseMap).map(([name, count]) => ({
       name,
       count,
       percentage: Number(((count / totalCourseSum) * 100).toFixed(1)),
     }));
 
-    const toolMap: Record<string, number> = {};
+    // 2. AI Tool Usage (Q5)
+    const toolMap: Record<string, number> = {
+      "ChatGPT": 0,
+      "Google Gemini": 0,
+      "Microsoft Copilot": 0,
+      "Grammarly": 0,
+      "QuillBot": 0,
+      "Perplexity": 0,
+    };
 
-    responses.forEach((r) => {
-      const tool = r.primaryTool || "ChatGPT";
-      if (tool !== "None") {
-        toolMap[tool] = (toolMap[tool] || 0) + 1;
-      }
+    responses.forEach((r: any) => {
+      const answers = r.surveyAnswers || {};
+      const tools: string[] = answers.q5Tools || (r.primaryTool ? [r.primaryTool] : ["ChatGPT"]);
+      tools.forEach((t) => {
+        if (toolMap[t] !== undefined) {
+          toolMap[t] += 1;
+        }
+      });
     });
 
-    const toolDistribution = Object.entries(toolMap).map(([name, users]) => ({
+    const toolDistribution = Object.entries(toolMap)
+      .map(([name, users]) => ({
+        name,
+        users,
+        percentage: Number(((users / total) * 100).toFixed(1)),
+      }))
+      .sort((a, b) => b.percentage - a.percentage);
+
+    // 3. Impact on Learning (Q8..Q15 Likert Ratings 1..5)
+    const impactSum: Record<string, { sum: number; count: number }> = {
+      "Understand Concepts": { sum: 0, count: 0 },
+      "Save Time": { sum: 0, count: 0 },
+      "Improve Learning": { sum: 0, count: 0 },
+      "Problem Solving": { sum: 0, count: 0 },
+      "Academic Performance": { sum: 0, count: 0 },
+    };
+
+    const likertKeysMap: Record<string, string> = {
+      q8: "Understand Concepts",
+      q9: "Save Time",
+      q10: "Improve Learning",
+      q11: "Problem Solving",
+      q12: "Academic Performance",
+    };
+
+    responses.forEach((r: any) => {
+      const answers = r.surveyAnswers || {};
+      const ratings = answers.likertRatings || {};
+      
+      Object.entries(likertKeysMap).forEach(([qKey, label]) => {
+        const val = ratings[qKey] || r.impactRating || 4;
+        impactSum[label].sum += val;
+        impactSum[label].count += 1;
+      });
+    });
+
+    const learningImpact = Object.entries(impactSum).map(([label, data]) => ({
+      label,
+      score: data.count ? Number((data.sum / data.count).toFixed(2)) : 4.25,
+    }));
+
+    // 4. Challenges (Q16)
+    const challengeMap: Record<string, number> = {
+      "Incorrect Information": 0,
+      "Overdependence": 0,
+      "Plagiarism Concern": 0,
+      "Reduced Thinking": 0,
+    };
+
+    responses.forEach((r: any) => {
+      const answers = r.surveyAnswers || {};
+      const chs: string[] = answers.q16Challenges || ["Incorrect Information", "Overdependence on AI"];
+      chs.forEach((ch) => {
+        let key = ch;
+        if (ch === "Overdependence on AI") key = "Overdependence";
+        if (ch === "Difficulty in verifying information") key = "Reduced Thinking";
+
+        if (challengeMap[key] !== undefined) {
+          challengeMap[key] += 1;
+        }
+      });
+    });
+
+    const challenges = Object.entries(challengeMap).map(([name, count]) => ({
       name,
-      users,
-      percentage: Number(((users / total) * 100).toFixed(1)),
+      percentage: Number(((count / total) * 100).toFixed(1)),
     }));
 
     return NextResponse.json({
@@ -42,8 +133,8 @@ export async function GET() {
       data: {
         courseDistribution,
         toolDistribution,
-        learningImpact: [],
-        challenges: [],
+        learningImpact,
+        challenges,
       },
     });
   } catch (error: any) {

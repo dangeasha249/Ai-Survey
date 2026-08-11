@@ -93,8 +93,9 @@ const SurveyResponseSchema: Schema = new Schema(
       problemText: String,
       suggestionsText: String,
     },
+    surveyAnswers: Schema.Types.Mixed,
   },
-  { timestamps: true }
+  { timestamps: true, strict: false }
 );
 
 const SurveyResponseModel: Model<ISurveyResponse> =

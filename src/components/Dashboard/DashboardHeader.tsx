@@ -5,15 +5,11 @@ import { useAuth } from "@/context/AuthContext";
 interface DashboardHeaderProps {
   dateRange: string;
   setDateRange: (range: string) => void;
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
 }
 
 export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   dateRange,
   setDateRange,
-  activeTab,
-  setActiveTab,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
@@ -35,49 +31,24 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
             Research Analytics & Insights
           </h2>
-          <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border flex items-center gap-1 ${
-            user?.role === "Researcher"
-              ? "bg-blue-50 text-blue-700 border-blue-200"
-              : "bg-amber-50 text-amber-700 border-amber-200"
-          }`}>
-            {user?.role === "Researcher" ? <ShieldCheck className="w-3 h-3" /> : <User className="w-3 h-3" />}
-            <span>{user?.role === "Researcher" ? "Researcher Admin" : user ? "Student Mode" : "Public View"}</span>
-          </span>
+          {user && (
+            <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border flex items-center gap-1 ${
+              user?.role === "Researcher"
+                ? "bg-blue-50 text-blue-700 border-blue-200"
+                : "bg-emerald-50 text-emerald-700 border-emerald-200"
+            }`}>
+              {user?.role === "Researcher" ? <ShieldCheck className="w-3 h-3" /> : <User className="w-3 h-3" />}
+              <span>{user?.role === "Researcher" ? "Researcher Admin" : "Student Mode"}</span>
+            </span>
+          )}
         </div>
         <p className="text-xs sm:text-sm font-medium text-slate-500 mt-0.5">
           AI-Edu Impact Survey • Real-time Academic Data
         </p>
       </div>
 
-      {/* Right Controls: View Tabs & Date Filter Dropdown */}
-      <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3">
-        {/* View Switcher Tabs */}
-        <div className="bg-slate-100 p-1 rounded-xl flex items-center gap-1 border border-slate-200/60">
-          <button
-            onClick={() => setActiveTab("dashboard")}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-              activeTab === "dashboard"
-                ? "bg-white text-blue-600 shadow-sm"
-                : "text-slate-600 hover:text-slate-900"
-            }`}
-          >
-            <BarChart2 className="w-3.5 h-3.5" />
-            <span>Overview</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab("responses")}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-              activeTab === "responses"
-                ? "bg-white text-blue-600 shadow-sm"
-                : "text-slate-600 hover:text-slate-900"
-            }`}
-          >
-            <Table className="w-3.5 h-3.5" />
-            <span>Responses Data</span>
-          </button>
-        </div>
-
+      {/* Right Controls: Date Filter Dropdown */}
+      <div className="flex items-center gap-3">
         {/* Date Filter Dropdown */}
         <div className="relative">
           <button

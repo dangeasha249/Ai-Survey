@@ -18,14 +18,23 @@ import { AuthProvider, useAuth } from "@/context/AuthContext";
 function MainContent() {
   const [activeSection, setActiveSection] = useState("home");
   const { totalResponses, aiUsers, nonAiUsers, avgImpactScore, coursesCount } = useSurvey();
-  const { loginUser, logoutUser } = useAuth();
+  const { loginUser, logoutUser, isAuthenticated } = useAuth();
 
   // Modals state
   const [isSurveyOpen, setIsSurveyOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [authTab, setAuthTab] = useState<"signin" | "signup">("signin");
+  const [authTab, setAuthTab] = useState<"signin" | "signup">("signup");
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [selectedMetricKey, setSelectedMetricKey] = useState<string | null>(null);
+
+  const handleOpenSurvey = () => {
+    if (isAuthenticated) {
+      setIsSurveyOpen(true);
+    } else {
+      setAuthTab("signup");
+      setIsAuthOpen(true);
+    }
+  };
 
   const scrollToDashboard = () => {
     const el = document.getElementById("dashboard-section");
@@ -45,14 +54,14 @@ function MainContent() {
           setAuthTab("signin");
           setIsAuthOpen(true);
         }}
-        onOpenSurvey={() => setIsSurveyOpen(true)}
+        onOpenSurvey={handleOpenSurvey}
         onOpenProfile={() => setIsProfileOpen(true)}
       />
 
       <main className="flex-grow">
         {/* 2. Top Hero Banner & Floating Summary Bar */}
         <HeroSection
-          onStartSurvey={() => setIsSurveyOpen(true)}
+          onStartSurvey={handleOpenSurvey}
           onLearnMore={() => window.location.assign("/about")}
         />
 
@@ -70,7 +79,7 @@ function MainContent() {
         {/* 4. Secondary Content Views (About, Instructions, FAQs, Contact) */}
         <InfoSections
           activeSection={activeSection}
-          onStartSurvey={() => setIsSurveyOpen(true)}
+          onStartSurvey={handleOpenSurvey}
         />
       </main>
 
@@ -91,7 +100,8 @@ function MainContent() {
         onClose={() => setIsAuthOpen(false)}
         onAuthSuccess={(userData) => {
           loginUser(userData);
-          scrollToDashboard();
+          setIsAuthOpen(false);
+          setIsSurveyOpen(true);
         }}
       />
 

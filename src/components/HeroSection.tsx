@@ -46,13 +46,25 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* Left Column Text Content */}
-          <div className="lg:col-span-6 space-y-6">
+          <div className="lg:col-span-6 space-y-5 sm:space-y-6">
             
+            {/* Mobile View Image (Appears First at Top on Mobile View) */}
+            <div className="block lg:hidden py-1 flex justify-center">
+              <Image
+                src="/images/landing-page.png"
+                alt="AI Tools in Education Illustration"
+                width={400}
+                height={320}
+                className="w-full max-w-xs sm:max-w-md h-auto object-contain"
+                priority
+              />
+            </div>
+
             <div className="space-y-2 sm:space-y-3">
               <h1 className="text-xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
                 AI Tools in Education:
               </h1>
-              <h2 className="text-xl sm:text-4xl lg:text-5xl font-extrabold text-blue-600 tracking-tight leading-tight">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-blue-600 tracking-tight leading-tight">
                 Understanding Their Impact on Teaching and Learning
               </h2>
             </div>
@@ -62,16 +74,20 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               on teaching effectiveness and student learning outcomes in higher education.
             </p>
 
-            {/* Mobile View Image (Appears Above Buttons on Mobile) */}
-            <div className="block lg:hidden py-2 flex justify-center">
-              <Image
-                src="/images/landing-page.png"
-                alt="AI Tools in Education Illustration"
-                width={400}
-                height={320}
-                className="w-full max-w-xs sm:max-w-md h-auto object-contain"
-                priority
-              />
+            {/* Trust Badges (Parallel Single Row Grid on Mobile View) */}
+            <div className="grid grid-cols-3 gap-1 sm:flex sm:flex-wrap sm:gap-2.5 pt-1 text-[9px] min-[370px]:text-[10px] sm:text-xs font-semibold text-blue-900">
+              <div className="flex items-center justify-center gap-1 bg-blue-100/70 px-1 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-blue-200/80 text-center whitespace-nowrap">
+                <CheckCircle2 className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-blue-600 shrink-0" />
+                <span>100% Confidential</span>
+              </div>
+              <div className="flex items-center justify-center gap-1 bg-blue-100/70 px-1 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-blue-200/80 text-center whitespace-nowrap">
+                <Lock className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-blue-600 shrink-0" />
+                <span>Secure Data</span>
+              </div>
+              <div className="flex items-center justify-center gap-1 bg-blue-100/70 px-1 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-blue-200/80 text-center whitespace-nowrap">
+                <UserCheck className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-blue-600 shrink-0" />
+                <span className="truncate">Academic Only</span>
+              </div>
             </div>
 
             {/* Action Buttons (Parallel & Smaller on Mobile View) */}
@@ -93,22 +109,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               </button>
             </div>
 
-            {/* Trust Badges (Compact Small Size) */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 pt-2 text-[11px] font-semibold text-blue-900">
-              <div className="flex items-center gap-1.5 bg-blue-100/70 px-2.5 py-1 rounded-full border border-blue-200/80">
-                <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                <span>100% Confidential</span>
-              </div>
-              <div className="flex items-center gap-1.5 bg-blue-100/70 px-2.5 py-1 rounded-full border border-blue-200/80">
-                <Lock className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                <span>Secure Data</span>
-              </div>
-              <div className="flex items-center gap-1.5 bg-blue-100/70 px-2.5 py-1 rounded-full border border-blue-200/80">
-                <UserCheck className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                <span>For Academic Research Only</span>
-              </div>
-            </div>
-
           </div>
 
           {/* Right Column Graphic / Artwork (Desktop Only) */}
@@ -125,51 +125,51 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
         </div>
 
-        {/* Key Information Bar */}
-        <div className="mt-10 sm:mt-14 w-full border-t border-slate-200/60 pt-6 sm:pt-8">
-          <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+        {/* Key Information Bar (Parallel 2-Column Grid on Mobile View) */}
+        <div className="mt-6 sm:mt-14 w-full border-t border-slate-200/60 pt-4 sm:pt-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
             
             {/* Target Group */}
-            <div className="flex items-center gap-3.5">
-              <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-100/80 text-blue-600 shrink-0">
-                <Users className="w-6 h-6" />
+            <div className="flex items-center gap-2 sm:gap-3.5 bg-blue-50/50 sm:bg-transparent p-2.5 sm:p-0 rounded-2xl border border-blue-100/60 sm:border-0">
+              <div className="flex items-center justify-center w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-blue-100/80 text-blue-600 shrink-0">
+                <Users className="w-4 h-4 sm:w-6 sm:h-6" />
               </div>
-              <div>
-                <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Target Group</p>
-                <p className="text-sm font-bold text-slate-800">Undergraduate Students</p>
+              <div className="min-w-0">
+                <p className="text-[10px] sm:text-xs font-semibold text-blue-600 uppercase tracking-wide truncate">Target Group</p>
+                <p className="text-xs sm:text-sm font-bold text-slate-800 truncate">Undergraduate</p>
               </div>
             </div>
 
             {/* Study Area */}
-            <div className="flex items-center gap-3.5">
-              <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-100/80 text-blue-600 shrink-0">
-                <MapPin className="w-6 h-6" />
+            <div className="flex items-center gap-2 sm:gap-3.5 bg-blue-50/50 sm:bg-transparent p-2.5 sm:p-0 rounded-2xl border border-blue-100/60 sm:border-0">
+              <div className="flex items-center justify-center w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-blue-100/80 text-blue-600 shrink-0">
+                <MapPin className="w-4 h-4 sm:w-6 sm:h-6" />
               </div>
-              <div>
-                <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Study Area</p>
-                <p className="text-sm font-bold text-slate-800">Maharashtra, India</p>
+              <div className="min-w-0">
+                <p className="text-[10px] sm:text-xs font-semibold text-blue-600 uppercase tracking-wide truncate">Study Area</p>
+                <p className="text-xs sm:text-sm font-bold text-slate-800 truncate">Maharashtra, India</p>
               </div>
             </div>
 
             {/* Survey Duration */}
-            <div className="flex items-center gap-3.5">
-              <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-100/80 text-blue-600 shrink-0">
-                <ClipboardList className="w-6 h-6" />
+            <div className="flex items-center gap-2 sm:gap-3.5 bg-blue-50/50 sm:bg-transparent p-2.5 sm:p-0 rounded-2xl border border-blue-100/60 sm:border-0">
+              <div className="flex items-center justify-center w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-blue-100/80 text-blue-600 shrink-0">
+                <ClipboardList className="w-4 h-4 sm:w-6 sm:h-6" />
               </div>
-              <div>
-                <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Survey Duration</p>
-                <p className="text-sm font-bold text-slate-800">10-15 Minutes</p>
+              <div className="min-w-0">
+                <p className="text-[10px] sm:text-xs font-semibold text-blue-600 uppercase tracking-wide truncate">Duration</p>
+                <p className="text-xs sm:text-sm font-bold text-slate-800 truncate">10-15 Minutes</p>
               </div>
             </div>
 
             {/* Purpose */}
-            <div className="flex items-center gap-3.5">
-              <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-100/80 text-blue-600 shrink-0">
-                <Database className="w-6 h-6" />
+            <div className="flex items-center gap-2 sm:gap-3.5 bg-blue-50/50 sm:bg-transparent p-2.5 sm:p-0 rounded-2xl border border-blue-100/60 sm:border-0">
+              <div className="flex items-center justify-center w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-blue-100/80 text-blue-600 shrink-0">
+                <Database className="w-4 h-4 sm:w-6 sm:h-6" />
               </div>
-              <div>
-                <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Purpose</p>
-                <p className="text-sm font-bold text-slate-800">Academic Research</p>
+              <div className="min-w-0">
+                <p className="text-[10px] sm:text-xs font-semibold text-blue-600 uppercase tracking-wide truncate">Purpose</p>
+                <p className="text-xs sm:text-sm font-bold text-slate-800 truncate">Academic Research</p>
               </div>
             </div>
 

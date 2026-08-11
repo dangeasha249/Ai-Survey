@@ -87,32 +87,35 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-      {cards.map((card) => {
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+      {cards.map((card, index) => {
         const Icon = card.icon;
+        const isLastItem = index === cards.length - 1;
         return (
           <div
             key={card.id}
             onClick={() => onSelectMetric(card.id)}
-            className={`${card.bgColor} ${card.borderColor} border rounded-2xl p-4 sm:p-5 flex flex-col justify-between cursor-pointer hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group`}
+            className={`${card.bgColor} ${card.borderColor} border rounded-2xl p-3.5 sm:p-5 flex flex-col justify-between cursor-pointer hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group ${
+              isLastItem ? "col-span-2 sm:col-span-1" : ""
+            }`}
           >
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start justify-between gap-2 sm:gap-3">
               <div>
-                <p className="text-xs font-semibold text-slate-600">{card.title}</p>
-                <div className="flex items-baseline gap-1.5 mt-2">
-                  <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                <p className="text-[11px] sm:text-xs font-semibold text-slate-600 leading-snug">{card.title}</p>
+                <div className="flex items-baseline gap-1 sm:gap-1.5 mt-1.5 sm:mt-2">
+                  <span className="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                     {card.value}
                   </span>
                   {card.subtext && (
-                    <span className="text-xs sm:text-sm font-semibold text-slate-500">
+                    <span className="text-[10px] sm:text-sm font-semibold text-slate-500">
                       {card.subtext}
                     </span>
                   )}
                 </div>
               </div>
 
-              <div className={`p-2.5 rounded-xl ${card.iconBg} shadow-sm shrink-0`}>
-                <Icon className="w-5 h-5" />
+              <div className={`p-2 sm:p-2.5 rounded-xl ${card.iconBg} shadow-sm shrink-0`}>
+                <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
             </div>
 

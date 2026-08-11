@@ -56,6 +56,7 @@ export async function POST(request: Request) {
       usesAI: body.usesAI || "Yes",
       primaryTool: body.primaryTool || "ChatGPT",
       impactRating: body.impactRating || 4,
+      surveyAnswers: body,
       studentProfile: body.studentProfile,
       awareness: body.awareness,
       aiUsage: body.aiUsage,
