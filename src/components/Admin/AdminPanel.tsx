@@ -160,11 +160,7 @@ export const AdminPanel: React.FC = () => {
     } catch {}
   };
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchResponses();
-    }
-  }, [isAuthenticated]);
+
 
   const handleDelete = async (id: string) => {
     if (!window.confirm(`Are you sure you want to delete response ${id}? This action cannot be undone.`)) return;
