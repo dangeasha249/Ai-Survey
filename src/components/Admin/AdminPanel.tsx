@@ -19,6 +19,7 @@ import {
   Building2,
 } from "lucide-react";
 import { AnalyticsCharts } from "@/components/Dashboard/AnalyticsCharts";
+import { useAuth } from "@/context/AuthContext";
 
 interface ResponseItem {
   id: string;
@@ -51,9 +52,13 @@ interface UserItem {
 }
 
 export const AdminPanel: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { user, isAuthenticated: isUserLoggedIn } = useAuth();
+  const [pinGranted, setPinGranted] = useState(false);
   const [pinInput, setPinInput] = useState("");
   const [pinError, setPinError] = useState(false);
+
+  const isResearcher = user?.role === "Researcher" || isUserLoggedIn;
+  const isAccessGranted = isResearcher || pinGranted;
 
   const [activeTab, setActiveTab] = useState<"responses" | "users" | "analytics">("responses");
   const [responses, setResponses] = useState<ResponseItem[]>([]);
@@ -69,11 +74,18 @@ export const AdminPanel: React.FC = () => {
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (isAccessGranted) {
+      fetchResponses();
+      fetchUsers();
+    }
+  }, [isAccessGranted]);
+
   // Admin PIN Passcode check
   const handlePinSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (pinInput === "1234" || pinInput === "admin123" || pinInput.toLowerCase() === "admin") {
-      setIsAuthenticated(true);
+      setPinGranted(true);
       setPinError(false);
       fetchResponses();
       fetchUsers();
@@ -193,8 +205,8 @@ export const AdminPanel: React.FC = () => {
   const nonAiCount = totalCount - aiUsersCount;
   const aiPercentage = totalCount ? ((aiUsersCount / totalCount) * 100).toFixed(1) : "0";
 
-  // Natural Clean Lock Screen
-  if (!isAuthenticated) {
+  // Natural Clean Lock Screen for guests without Researcher session
+  if (!isAccessGranted) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center p-4">
         <div className="w-full max-w-sm bg-white rounded-2xl p-7 border border-slate-200 shadow-sm space-y-5 text-center animate-fade-in">
