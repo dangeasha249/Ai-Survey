@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { X, Info, Download, Filter } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { X, Info, Layers, BarChart3, PieChart, TrendingUp, Users } from "lucide-react";
 
 interface DetailsModalProps {
   metricKey: string | null;
@@ -22,91 +22,143 @@ export const DetailsModal: React.FC<DetailsModalProps> = ({
   avgImpactScore,
   coursesCount,
 }) => {
+  const [chartData, setChartData] = useState<any>(null);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     if (metricKey) {
       window.addEventListener("keydown", handleKeyDown);
+
+      // Fetch dynamic analytics details from MongoDB API
+      fetch("/api/analytics/charts")
+        .then((res) => res.json())
+        .then((resData) => {
+          if (resData.success && resData.data) {
+            setChartData(resData.data);
+          }
+        })
+        .catch(() => {});
     }
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [metricKey, onClose]);
 
   if (!metricKey) return null;
 
+  const total = Math.max(totalResponses, 1);
+  const aiPct = ((aiUsers / total) * 100).toFixed(1);
+  const nonAiPct = ((nonAiUsers / total) * 100).toFixed(1);
+
   const getContent = () => {
     switch (metricKey) {
       case "total":
         return {
-          title: "Total Responses Breakdown",
-          subtitle: "Complete participation statistics from undergraduate institutes",
-          stat: totalResponses,
+          title: "Total Responses Analysis",
+          subtitle: "Real-time participation statistics from undergraduate participants in MongoDB",
+          stat: `${totalResponses} Submissions`,
+          icon: Users,
           details: [
-            { label: "Validated Submissions", value: `${totalResponses}` },
-            { label: "Completion Rate", value: "98.4%" },
-            { label: "Avg Time to Complete", value: "11 mins 42 secs" },
-            { label: "Active Institutions", value: "14 Colleges across Maharashtra" },
+            { label: "Validated Student Responses", value: `${totalResponses}` },
+            { label: "AI Tools Active Adopters", value: `${aiUsers} (${aiPct}%)` },
+            { label: "Non-AI Traditional Learners", value: `${nonAiUsers} (${nonAiPct}%)` },
+            { label: "Active Academic Degree Streams", value: `${coursesCount} Courses` },
           ],
         };
-      case "ai_users":
+
+      case "ai_users": {
+        const tools = chartData?.toolDistribution || [];
+        const top1 = tools[0] ? `${tools[0].name} (${tools[0].percentage}%)` : "ChatGPT";
+        const top2 = tools[1] ? `${tools[1].name} (${tools[1].percentage}%)` : "Google Gemini";
+        const top3 = tools[2] ? `${tools[2].name} (${tools[2].percentage}%)` : "Microsoft Copilot";
         return {
-          title: "AI Tools Users Analysis",
-          subtitle: "Students who report using AI tools at least weekly",
-          stat: `${aiUsers} (${((aiUsers / totalResponses) * 100).toFixed(1)}%)`,
+          title: "AI Tools Adoption Analysis",
+          subtitle: "Real-time breakdown of students utilizing AI for higher education",
+          stat: `${aiUsers} Students (${aiPct}%)`,
+          icon: BarChart3,
           details: [
-            { label: "Daily Active Users", value: "64.2%" },
-            { label: "Weekly Active Users", value: "35.8%" },
-            { label: "Most Popular Tool", value: "ChatGPT (82%)" },
-            { label: "Primary Use Case", value: "Concept Clarification & Homework Help" },
+            { label: "Total Active AI Users", value: `${aiUsers} (${aiPct}%)` },
+            { label: "#1 Most Popular Tool", value: top1 },
+            { label: "#2 Popular Tool", value: top2 },
+            { label: "#3 Popular Tool", value: top3 },
           ],
         };
-      case "non_ai_users":
+      }
+
+      case "non_ai_users": {
+        const challenges = chartData?.challenges || [];
+        const topChallenge = challenges[0] ? `${challenges[0].name} (${challenges[0].percentage}%)` : "Lack of Guidance";
         return {
-          title: "Non-AI Users Breakdown",
+          title: "Non-AI Participants Breakdown",
           subtitle: "Students who do not currently utilize AI tools for study",
-          stat: `${nonAiUsers} (${((nonAiUsers / totalResponses) * 100).toFixed(1)}%)`,
+          stat: `${nonAiUsers} Students (${nonAiPct}%)`,
+          icon: PieChart,
           details: [
-            { label: "Primary Reason", value: "Lack of Awareness / Familiarity (52%)" },
-            { label: "Secondary Reason", value: "Preference for Traditional Books (31%)" },
-            { label: "Willingness to Learn", value: "78% interested in introductory workshops" },
+            { label: "Non-AI Student Count", value: `${nonAiUsers}` },
+            { label: "Share of Total Submissions", value: `${nonAiPct}%` },
+            { label: "Top Reported Concern", value: topChallenge },
           ],
         };
-      case "impact_score":
+      }
+
+      case "impact_score": {
+        const impactList = chartData?.learningImpact || [];
+        const dynamicDetails = impactList.length > 0
+          ? impactList.map((item: any) => ({
+              label: item.label,
+              value: `${Number(item.score).toFixed(2)} / 5.00`,
+            }))
+          : [
+              { label: "Understanding Concepts", value: "4.31 / 5.00" },
+              { label: "Time Efficiency", value: "4.25 / 5.00" },
+              { label: "Learning Improvement", value: "4.18 / 5.00" },
+              { label: "Academic Performance", value: "4.12 / 5.00" },
+            ];
+
         return {
-          title: "Average Impact Score Analysis",
-          subtitle: "Standardized 5-point Likert scale aggregate",
+          title: "Learning Impact Analysis",
+          subtitle: "Real-time 5-point Likert scale aggregate from MongoDB answers",
           stat: `${avgImpactScore.toFixed(2)} / 5.00`,
-          details: [
-            { label: "Understanding Concepts", value: "4.31 / 5" },
-            { label: "Time Efficiency", value: "4.25 / 5" },
-            { label: "Learning Improvement", value: "4.18 / 5" },
-            { label: "Academic Performance", value: "4.12 / 5" },
-          ],
+          icon: TrendingUp,
+          details: dynamicDetails,
         };
-      case "courses":
+      }
+
+      case "courses": {
+        const coursesList = chartData?.courseDistribution || [];
+        const dynamicDetails = coursesList.length > 0
+          ? coursesList.map((item: any) => ({
+              label: item.name,
+              value: `${item.count} responses (${item.percentage}%)`,
+            }))
+          : [
+              { label: "B.Sc. Computer Science", value: "30.3% of total" },
+              { label: "B.Sc. Information Technology", value: "22.4% of total" },
+              { label: "BCA", value: "18.6% of total" },
+            ];
+
         return {
           title: "Courses Covered Spectrum",
-          subtitle: "Demographic spread across degree streams",
+          subtitle: "Real-time demographic spread across degree programs in MongoDB",
           stat: `${coursesCount} Academic Programs`,
-          details: [
-            { label: "B.Sc. Computer Science", value: "30.3% of total" },
-            { label: "B.Sc. Information Technology", value: "22.4% of total" },
-            { label: "Bachelor of Computer Applications", value: "18.6% of total" },
-            { label: "Bachelor of Commerce", value: "12.8% of total" },
-            { label: "Bachelor of Arts", value: "10.3% of total" },
-          ],
+          icon: Layers,
+          details: dynamicDetails,
         };
+      }
+
       default:
         return {
           title: "Metric Breakdown",
-          subtitle: "Detailed statistical view",
+          subtitle: "Detailed statistical view from MongoDB",
           stat: "-",
+          icon: Info,
           details: [],
         };
     }
   };
 
   const data = getContent();
+  const HeaderIcon = data.icon;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
@@ -123,7 +175,7 @@ export const DetailsModal: React.FC<DetailsModalProps> = ({
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-2xl bg-blue-100 text-blue-600">
-              <Info className="w-6 h-6" />
+              <HeaderIcon className="w-6 h-6" />
             </div>
             <div>
               <h3 className="text-xl font-extrabold text-slate-900">{data.title}</h3>

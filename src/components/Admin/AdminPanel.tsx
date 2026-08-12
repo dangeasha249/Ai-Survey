@@ -40,20 +40,33 @@ interface ResponseItem {
   impactRating?: number;
 }
 
+interface UserItem {
+  id: string;
+  name: string;
+  email: string;
+  role: "Student" | "Researcher";
+  institution?: string;
+  department?: string;
+  createdAt: string;
+}
+
 export const AdminPanel: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pinInput, setPinInput] = useState("");
   const [pinError, setPinError] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<"responses" | "analytics">("responses");
+  const [activeTab, setActiveTab] = useState<"responses" | "users" | "analytics">("responses");
   const [responses, setResponses] = useState<ResponseItem[]>([]);
+  const [usersList, setUsersList] = useState<UserItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [userSearchQuery, setUserSearchQuery] = useState("");
   const [selectedCourseFilter, setSelectedCourseFilter] = useState("all");
   const [selectedAiFilter, setSelectedAiFilter] = useState("all");
 
   const [selectedResponse, setSelectedResponse] = useState<ResponseItem | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
 
   // Admin PIN Passcode check
@@ -63,6 +76,7 @@ export const AdminPanel: React.FC = () => {
       setIsAuthenticated(true);
       setPinError(false);
       fetchResponses();
+      fetchUsers();
     } else {
       setPinError(true);
     }
@@ -79,10 +93,59 @@ export const AdminPanel: React.FC = () => {
         }
       }
     } catch {
-      // Ignore
+      setActionMessage("Error loading responses data.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch("/api/admin/users");
+      if (res.ok) {
+        const json = await res.json();
+        if (json.users) {
+          setUsersList(json.users);
+        }
+      }
+    } catch {
+      // Quiet fail
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, userName: string) => {
+    if (!confirm(`Are you sure you want to delete user account "${userName}"?`)) return;
+    setDeletingUserId(userId);
+    try {
+      const res = await fetch(`/api/admin/users?id=${userId}`, { method: "DELETE" });
+      const json = await res.json();
+      if (json.success) {
+        setActionMessage(`User "${userName}" deleted successfully.`);
+        fetchUsers();
+      } else {
+        setActionMessage(json.message || "Failed to delete user.");
+      }
+    } catch {
+      setActionMessage("Error deleting user.");
+    } finally {
+      setDeletingUserId(null);
+    }
+  };
+
+  const handleToggleUserRole = async (userId: string, currentRole: string) => {
+    const newRole = currentRole === "Researcher" ? "Student" : "Researcher";
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "updateRole", userId, newRole }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setActionMessage(`Role updated to ${newRole}.`);
+        fetchUsers();
+      }
+    } catch {}
   };
 
   useEffect(() => {
@@ -288,6 +351,18 @@ export const AdminPanel: React.FC = () => {
         </button>
 
         <button
+          onClick={() => setActiveTab("users")}
+          className={`pb-2 px-1 text-xs font-bold border-b-2 transition flex items-center gap-2 ${
+            activeTab === "users"
+              ? "border-slate-900 text-slate-900"
+              : "border-transparent text-slate-500 hover:text-slate-800"
+          }`}
+        >
+          <Users className="w-4 h-4 text-blue-600" />
+          <span>User Management ({usersList.length})</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab("analytics")}
           className={`pb-2 px-1 text-xs font-bold border-b-2 transition flex items-center gap-2 ${
             activeTab === "analytics"
@@ -423,7 +498,115 @@ export const AdminPanel: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 2: Analytics Overview */}
+      {/* TAB 2: User Management Table */}
+      {activeTab === "users" && (
+        <div className="space-y-4 animate-fade-in">
+          
+          {/* Search Controls */}
+          <div className="bg-white rounded-2xl p-3.5 border border-slate-200/90 shadow-sm flex items-center justify-between gap-3">
+            <div className="relative flex-1 max-w-md">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+              <input
+                type="text"
+                value={userSearchQuery}
+                onChange={(e) => setUserSearchQuery(e.target.value)}
+                placeholder="Search user by name or email..."
+                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-400"
+              />
+            </div>
+
+            <button
+              onClick={fetchUsers}
+              className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs flex items-center gap-1.5 transition"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Refresh Users</span>
+            </button>
+          </div>
+
+          {/* Users Table */}
+          <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 border-b border-slate-200/80 font-bold text-slate-500 uppercase tracking-wider">
+                  <tr>
+                    <th className="px-5 py-3">User Name</th>
+                    <th className="px-5 py-3">Email Address</th>
+                    <th className="px-5 py-3">Account Role</th>
+                    <th className="px-5 py-3">Institution</th>
+                    <th className="px-5 py-3">Registered Date</th>
+                    <th className="px-5 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                  {usersList.filter((u) =>
+                    u.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
+                    u.email.toLowerCase().includes(userSearchQuery.toLowerCase())
+                  ).length > 0 ? (
+                    usersList
+                      .filter((u) =>
+                        u.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
+                        u.email.toLowerCase().includes(userSearchQuery.toLowerCase())
+                      )
+                      .map((u) => (
+                        <tr key={u.id} className="hover:bg-slate-50/80 transition">
+                          <td className="px-5 py-3.5 font-bold text-slate-900 flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0">
+                              {u.name.slice(0, 1).toUpperCase()}
+                            </div>
+                            <span>{u.name}</span>
+                          </td>
+                          <td className="px-5 py-3.5 text-slate-700">
+                            {u.email}
+                          </td>
+                          <td className="px-5 py-3.5">
+                            <button
+                              onClick={() => handleToggleUserRole(u.id, u.role)}
+                              title="Click to toggle role"
+                              className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold border transition ${
+                                u.role === "Researcher"
+                                  ? "bg-purple-50 text-purple-700 border-purple-200"
+                                  : "bg-blue-50 text-blue-700 border-blue-200"
+                              }`}
+                            >
+                              {u.role}
+                            </button>
+                          </td>
+                          <td className="px-5 py-3.5 text-slate-600">
+                            {u.institution || "Not Specified"}
+                          </td>
+                          <td className="px-5 py-3.5 text-slate-400 text-[11px] whitespace-nowrap">
+                            {u.createdAt}
+                          </td>
+                          <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                            <button
+                              onClick={() => handleDeleteUser(u.id, u.name)}
+                              disabled={deletingUserId === u.id}
+                              className="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg text-[11px] font-bold transition flex items-center gap-1 ml-auto"
+                              title="Delete user account"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>Delete</span>
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                  ) : (
+                    <tr>
+                      <td colSpan={6} className="px-5 py-10 text-center text-slate-400">
+                        No registered users found in MongoDB database.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* TAB 3: Analytics Overview */}
       {activeTab === "analytics" && (
         <div className="space-y-4 animate-fade-in">
           <AnalyticsCharts />

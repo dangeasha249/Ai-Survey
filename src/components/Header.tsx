@@ -131,41 +131,43 @@ export const Header: React.FC<HeaderProps> = ({
               {isProfilePanelOpen && (
                 <div className="absolute right-0 top-12 mt-2 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-4">
                   
-                  {/* User Profile Header Card */}
-                  <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-extrabold text-base flex items-center justify-center shrink-0 uppercase shadow-sm">
-                      {user?.name ? user.name.slice(0, 1) : <User className="w-6 h-6" />}
-                    </div>
-                    <div className="overflow-hidden space-y-0.5">
-                      <h4 className="text-sm font-extrabold text-slate-900 truncate">
-                        {user?.name || "Academic Visitor"}
-                      </h4>
-                      <p className="text-xs text-slate-500 truncate">
-                        {user?.email || "guest@aiedu-survey.org"}
-                      </p>
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-700">
-                        {user?.role === "Researcher" ? <ShieldCheck className="w-3 h-3" /> : <CheckCircle2 className="w-3 h-3" />}
-                        <span>{user?.role ? `${user.role} Mode` : "Public Student Guest"}</span>
-                      </span>
-                    </div>
-                  </div>
+                  {isAuthenticated ? (
+                    <>
+                      {/* User Profile Header Card */}
+                      <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center gap-3">
+                        <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-extrabold text-base flex items-center justify-center shrink-0 uppercase shadow-sm">
+                          {user?.name ? user.name.slice(0, 1) : "A"}
+                        </div>
+                        <div className="overflow-hidden space-y-0.5">
+                          <h4 className="text-sm font-extrabold text-slate-900 truncate">
+                            {user?.name}
+                          </h4>
+                          <p className="text-xs text-slate-500 truncate">
+                            {user?.email}
+                          </p>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-700">
+                            {user?.role === "Researcher" ? <ShieldCheck className="w-3 h-3" /> : <CheckCircle2 className="w-3 h-3" />}
+                            <span>{user?.role ? `${user.role} Mode` : "Verified Participant"}</span>
+                          </span>
+                        </div>
+                      </div>
 
-                  {/* Details / Institution */}
-                  <div className="text-xs space-y-1.5 px-1 font-medium text-slate-600">
-                    <div className="flex justify-between py-1 border-b border-slate-100">
-                      <span className="text-slate-400">Institution</span>
-                      <span className="font-bold text-slate-800 truncate max-w-[150px]">{user?.institution || "Higher Education Maharashtra"}</span>
-                    </div>
-                    <div className="flex justify-between py-1 border-b border-slate-100">
-                      <span className="text-slate-400">Survey Status</span>
-                      <span className="font-bold text-emerald-600">Response Active</span>
-                    </div>
-                  </div>
+                      {/* Details / Institution */}
+                      <div className="text-xs space-y-1.5 px-1 font-medium text-slate-600">
+                        {user?.institution && (
+                          <div className="flex justify-between py-1 border-b border-slate-100">
+                            <span className="text-slate-400">Institution</span>
+                            <span className="font-bold text-slate-800 truncate max-w-[150px]">{user.institution}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between py-1 border-b border-slate-100">
+                          <span className="text-slate-400">Survey Status</span>
+                          <span className="font-bold text-amber-600">Ready to Take</span>
+                        </div>
+                      </div>
 
-                  {/* Actions Buttons */}
-                  <div className="space-y-2 pt-1">
-                    {isAuthenticated ? (
-                      <>
+                      {/* Action Buttons */}
+                      <div className="space-y-2 pt-1">
                         <button
                           onClick={() => {
                             setIsProfilePanelOpen(false);
@@ -187,20 +189,38 @@ export const Header: React.FC<HeaderProps> = ({
                           <LogOut className="w-4 h-4" />
                           <span>Sign Out Account</span>
                         </button>
-                      </>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          setIsProfilePanelOpen(false);
-                          if (onOpenLogin) onOpenLogin();
-                        }}
-                        className="w-full py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition"
-                      >
-                        <LogIn className="w-4 h-4" />
-                        <span>Sign In / Researcher Login</span>
-                      </button>
-                    )}
-                  </div>
+                      </div>
+                    </>
+                  ) : (
+                    /* Guest Welcome View */
+                    <div className="space-y-3.5 text-center p-1">
+                      <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto border border-blue-100 shadow-sm">
+                        <User className="w-6 h-6" />
+                      </div>
+
+                      <div className="space-y-1">
+                        <h4 className="text-base font-extrabold text-slate-900">
+                          Welcome, Academic Guest
+                        </h4>
+                        <p className="text-xs text-slate-500 leading-relaxed">
+                          Sign In or Create an Account to participate in the AI Impact Survey and record your responses.
+                        </p>
+                      </div>
+
+                      <div className="space-y-2 pt-1">
+                        <button
+                          onClick={() => {
+                            setIsProfilePanelOpen(false);
+                            if (onOpenLogin) onOpenLogin();
+                          }}
+                          className="w-full py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-md transition"
+                        >
+                          <LogIn className="w-4 h-4" />
+                          <span>Sign In / Create Account</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
                 </div>
               )}

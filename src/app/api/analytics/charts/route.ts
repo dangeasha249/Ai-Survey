@@ -101,21 +101,25 @@ export async function GET() {
       score: data.count ? Number((data.sum / data.count).toFixed(2)) : 4.25,
     }));
 
-    // 4. Challenges (Q16)
+    // 4. Challenges (Q16 - Top reported issues)
     const challengeMap: Record<string, number> = {
       "Incorrect Information": 0,
-      "Overdependence": 0,
-      "Plagiarism Concern": 0,
-      "Reduced Thinking": 0,
+      "Overdependence on AI": 0,
+      "Lack of Guidance": 0,
+      "Plagiarism Concerns": 0,
+      "Feature Costs": 0,
     };
 
     responses.forEach((r: any) => {
       const answers = r.surveyAnswers || {};
-      const chs: string[] = answers.q16Challenges || ["Incorrect Information", "Overdependence on AI"];
+      const chs: string[] = answers.q16Challenges || [];
       chs.forEach((ch) => {
         let key = ch;
-        if (ch === "Overdependence on AI") key = "Overdependence";
-        if (ch === "Difficulty in verifying information") key = "Reduced Thinking";
+        if (ch.includes("Incorrect") || ch.includes("False")) key = "Incorrect Information";
+        else if (ch.includes("Overdependence") || ch.includes("dependence")) key = "Overdependence on AI";
+        else if (ch.includes("guidance") || ch.includes("training")) key = "Lack of Guidance";
+        else if (ch.includes("Plagiarism") || ch.includes("Ethical")) key = "Plagiarism Concerns";
+        else if (ch.includes("Cost") || ch.includes("Limited")) key = "Feature Costs";
 
         if (challengeMap[key] !== undefined) {
           challengeMap[key] += 1;
@@ -123,9 +127,10 @@ export async function GET() {
       });
     });
 
+    const totalRes = Math.max(responses.length, 1);
     const challenges = Object.entries(challengeMap).map(([name, count]) => ({
       name,
-      percentage: Number(((count / total) * 100).toFixed(1)),
+      percentage: Number(((count / totalRes) * 100).toFixed(1)),
     }));
 
     return NextResponse.json({
