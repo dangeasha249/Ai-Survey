@@ -193,7 +193,7 @@ export const DetailsModal: React.FC<DetailsModalProps> = ({
           <div className="space-y-2 pt-2">
             <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Detailed Data Points</h4>
             <div className="bg-slate-50 rounded-2xl p-3 border border-slate-200/80 divide-y divide-slate-200/60">
-              {data.details.map((item, idx) => (
+              {data.details.map((item: { label: string; value: string }, idx: number) => (
                 <div key={idx} className="py-2.5 flex justify-between items-center text-xs sm:text-sm">
                   <span className="font-semibold text-slate-700">{item.label}</span>
                   <span className="font-bold text-slate-900">{item.value}</span>

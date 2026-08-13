@@ -330,7 +330,7 @@ export const AdminPanel: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setIsAuthenticated(false)}
+            onClick={() => setPinGranted(false)}
             className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition"
             title="Lock Panel"
           >
