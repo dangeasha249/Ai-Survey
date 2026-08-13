@@ -57,8 +57,9 @@ export const AdminPanel: React.FC = () => {
   const [pinInput, setPinInput] = useState("");
   const [pinError, setPinError] = useState(false);
 
-  const isResearcher = user?.role === "Researcher" || isUserLoggedIn;
-  const isAccessGranted = isResearcher || pinGranted;
+  const isStudent = isUserLoggedIn && user?.role === "Student";
+  const isResearcher = isUserLoggedIn && user?.role === "Researcher";
+  const isAccessGranted = isResearcher || (pinGranted && !isStudent);
 
   const [activeTab, setActiveTab] = useState<"responses" | "users" | "analytics">("responses");
   const [responses, setResponses] = useState<ResponseItem[]>([]);
@@ -201,7 +202,41 @@ export const AdminPanel: React.FC = () => {
   const nonAiCount = totalCount - aiUsersCount;
   const aiPercentage = totalCount ? ((aiUsersCount / totalCount) * 100).toFixed(1) : "0";
 
-  // Natural Clean Lock Screen for guests without Researcher session
+  // 1. Strict Access Restriction for Student Accounts
+  if (isStudent) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center p-4">
+        <div className="w-full max-w-sm bg-white rounded-2xl p-7 border border-red-200 shadow-sm space-y-5 text-center animate-fade-in">
+          <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mx-auto border border-red-100">
+            <Lock className="w-6 h-6" />
+          </div>
+
+          <div className="space-y-1.5">
+            <h2 className="text-xl font-extrabold text-slate-900">
+              Access Restricted
+            </h2>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Your account (<strong className="text-slate-900">{user?.name}</strong> • Student Role) does not have administrative permissions.
+            </p>
+            <p className="text-[11px] text-slate-400">
+              The Admin Panel is exclusively reserved for academic Researchers. Student accounts cannot view participant datasets or admin controls.
+            </p>
+          </div>
+
+          <div className="pt-2">
+            <a
+              href="/"
+              className="block w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition shadow-sm"
+            >
+              Back to Home Page
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Lock Screen for unauthenticated guests
   if (!isAccessGranted) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center p-4">
