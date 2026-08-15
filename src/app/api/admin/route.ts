@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import mongoose from "mongoose";
 import { connectToDatabase } from "@/lib/mongodb";
 import SurveyResponseModel from "@/models/SurveyResponse";
 
@@ -45,23 +46,31 @@ export async function GET() {
     return NextResponse.json({ success: false, message: "Failed to fetch admin data" }, { status: 500 });
   }
 }
-
 // DELETE a specific response by ID
 export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
-    await connectToDatabase();
-
-    if (id) {
-      await SurveyResponseModel.deleteOne({ $or: [{ responseId: id }, { _id: id }] });
-      return NextResponse.json({ success: true, message: `Response ${id} deleted successfully.` });
+    if (!id) {
+      return NextResponse.json({ success: false, message: "Response ID is required." }, { status: 400 });
     }
 
-    return NextResponse.json({ success: false, message: "Response ID is required." }, { status: 400 });
+    await connectToDatabase();
+
+    const query = mongoose.Types.ObjectId.isValid(id)
+      ? { $or: [{ responseId: id }, { _id: id }] }
+      : { responseId: id };
+
+    const result = await SurveyResponseModel.deleteOne(query);
+
+    return NextResponse.json({
+      success: true,
+      message: `Response ${id} deleted successfully.`,
+      deletedCount: result.deletedCount,
+    });
   } catch (error: any) {
     console.error("Admin DELETE Error:", error);
-    return NextResponse.json({ success: false, message: "Failed to delete response" }, { status: 500 });
+    return NextResponse.json({ success: false, message: error?.message || "Failed to delete response" }, { status: 500 });
   }
 }
