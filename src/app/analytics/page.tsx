@@ -74,7 +74,7 @@ function AnalyticsContent() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900">
-      
+
       {/* 1. Header */}
       <Header
         activeSection={activeSection}
@@ -89,10 +89,10 @@ function AnalyticsContent() {
 
       {/* 2. Main Page Content */}
       <main className="flex-1 w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 py-8 space-y-8 animate-fade-in">
-        
+
         {/* Page Header Section - Natural Clean Typography */}
         <div className="space-y-2 text-center py-2">
-          
+
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             Research Analytics & Insights
           </h1>
@@ -108,7 +108,6 @@ function AnalyticsContent() {
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
               <span>Primary Research Metrics</span>
-              <span className="text-xs font-medium text-slate-500">(Click card for detailed breakdown)</span>
             </h2>
           </div>
 
@@ -129,15 +128,9 @@ function AnalyticsContent() {
               <h2 className="text-xl font-extrabold text-slate-900">
                 Empirical Data Visualizations
               </h2>
-              <p className="text-xs text-slate-500">
-                Live aggregations calculated directly from MongoDB student questionnaire submissions.
-              </p>
             </div>
 
-            <div className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-200/70">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>Real-Time Database Sync</span>
-            </div>
+
           </div>
 
           <AnalyticsCharts />
