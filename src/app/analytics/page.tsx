@@ -90,14 +90,14 @@ function AnalyticsContent() {
       {/* 2. Main Page Content */}
       <main className="flex-1 w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 py-8 space-y-8 animate-fade-in">
         
-        {/* Page Header Section - Natural Academic Design */}
-        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/90 shadow-sm space-y-2 text-center">
+        {/* Page Header Section - Natural Clean Typography */}
+        <div className="space-y-2 text-center py-2">
           
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             Research Analytics & Insights
           </h1>
 
-          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal max-w-3xl mx-auto">
+          <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal max-w-3xl mx-auto">
             Empirical data analysis examining the adoption, learning impact, and ethical challenges of Artificial Intelligence tools across higher education degree programs.
           </p>
 

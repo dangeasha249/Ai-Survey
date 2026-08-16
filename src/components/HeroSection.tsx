@@ -2,16 +2,16 @@
 
 import React from "react";
 import Image from "next/image";
-import { 
-  FileEdit, 
-  Info, 
-  CheckCircle2, 
-  Lock, 
-  UserCheck, 
-  Users, 
-  MapPin, 
-  ClipboardList, 
-  Database 
+import {
+  FileEdit,
+  Info,
+  CheckCircle2,
+  Lock,
+  UserCheck,
+  Users,
+  MapPin,
+  ClipboardList,
+  Database
 } from "lucide-react";
 
 interface HeroSectionProps {
@@ -25,7 +25,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 }) => {
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-sky-50/70 via-blue-50/40 to-slate-50 pt-8 sm:pt-10 pb-10 sm:pb-16">
-      
+
       {/* Background Decorative SVG Waves */}
       <div className="absolute inset-0 pointer-events-none opacity-40">
         <svg className="w-full h-full" viewBox="0 0 1440 600" fill="none">
@@ -44,10 +44,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
       <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-          
+
           {/* Left Column Text Content */}
           <div className="lg:col-span-6 space-y-5 sm:space-y-6">
-            
+
             {/* Mobile View Image (Appears First at Top on Mobile View) */}
             <div className="block lg:hidden py-1 flex justify-center">
               <Image
@@ -65,7 +65,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 AI Tools in Education:
               </h1>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-blue-600 tracking-tight leading-tight">
-                Understanding Their Impact on Teaching and Learning
+                Understanding Their Impact on Teaching
               </h2>
             </div>
 
@@ -128,7 +128,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         {/* Key Information Bar (Parallel 2-Column Grid on Mobile View) */}
         <div className="mt-6 sm:mt-14 w-full border-t border-slate-200/60 pt-4 sm:pt-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
-            
+
             {/* Target Group */}
             <div className="flex items-center gap-2 sm:gap-3.5 bg-blue-50/50 sm:bg-transparent p-2.5 sm:p-0 rounded-2xl border border-blue-100/60 sm:border-0">
               <div className="flex items-center justify-center w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-blue-100/80 text-blue-600 shrink-0">
