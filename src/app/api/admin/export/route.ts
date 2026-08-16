@@ -9,59 +9,60 @@ export async function GET() {
 
     const headers = [
       "Response ID",
-      "Course",
-      "Year of Study",
-      "AI Aware",
-      "Used AI",
-      "AI Tools Used",
-      "Frequency",
-      "Purposes",
-      "Q8 Understand Concepts",
-      "Q9 Save Time",
-      "Q10 Improve Learning",
-      "Q11 Problem Solving",
-      "Q12 Academic Performance",
-      "Q13 Learn Independently",
-      "Q14 Interesting Learning",
-      "Q15 Teachers Explanation",
-      "Challenges",
-      "Verify Info",
-      "Attended Workshop",
-      "Need Training",
-      "Overall Opinion",
+      "User Email",
+      "Q1 Age Group",
+      "Q2 Teaching Experience",
+      "Q3 Qualification",
+      "Q4 Attended AI Workshop",
+      "Q5 Affiliated College",
+      "Q6 AI Knowledge",
+      "Q7 Familiarity with AI Tools",
+      "Q8 Regular AI Usage",
+      "Q9 Notes & Exam Prep Usage",
+      "Q10 Concept Explanation Impact",
+      "Q11 Time Saving Impact",
+      "Q12 Teaching Quality Impact",
+      "Q13 Interactive Classroom Impact",
+      "Q14 Student Personalized Support",
+      "Q15 Student Concept Understanding",
+      "Q16 Student Independent Learning",
+      "Q17 Student Critical Thinking",
+      "Q18 Student Performance Impact",
+      "Q19 Teacher Workload Reduction",
+      "Q20 Overdependence Risk",
+      "Q21 Institutional Guidelines Need",
       "Submitted At",
     ];
 
     const rows = responses.map((r: any) => {
       const sa = r.surveyAnswers || {};
       const likert = sa.likertRatings || {};
-
-      const toolsStr = Array.isArray(sa.q5Tools) ? sa.q5Tools.join("; ") : (r.primaryTool || "ChatGPT");
-      const purpStr = Array.isArray(sa.q7Purposes) ? sa.q7Purposes.join("; ") : "";
-      const chalStr = Array.isArray(sa.q16Challenges) ? sa.q16Challenges.join("; ") : "";
+      const sp = sa.staffProfile || {};
 
       return [
         `"${r.responseId || r._id}"`,
-        `"${sa.q1Course || r.course || "B.Sc. CS"}"`,
-        `"${sa.q2Year || "N/A"}"`,
-        `"${sa.q3Aware || "Yes"}"`,
-        `"${sa.q4UsedAI || r.usesAI || "Yes"}"`,
-        `"${toolsStr}"`,
-        `"${sa.q6Frequency || "Daily"}"`,
-        `"${purpStr}"`,
-        `"${likert.q8 || 4}"`,
-        `"${likert.q9 || 4}"`,
-        `"${likert.q10 || 4}"`,
-        `"${likert.q11 || 4}"`,
-        `"${likert.q12 || 4}"`,
-        `"${likert.q13 || 4}"`,
-        `"${likert.q14 || 4}"`,
-        `"${likert.q15 || 4}"`,
-        `"${chalStr}"`,
-        `"${sa.q17Verify || "N/A"}"`,
-        `"${sa.q18Workshop || "N/A"}"`,
-        `"${sa.q19NeedTraining || "N/A"}"`,
-        `"${sa.q20OverallOpinion || "N/A"}"`,
+        `"${r.userEmail || sa.userEmail || "N/A"}"`,
+        `"${sa.q1AgeGroup || sp.ageGroup || "N/A"}"`,
+        `"${sa.q2Experience || sp.experience || "N/A"}"`,
+        `"${sa.q3Qualification || sp.qualification || "N/A"}"`,
+        `"${sa.q4Workshop || sp.workshop || "N/A"}"`,
+        `"${sa.q5College || sp.college || r.course || "N/A"}"`,
+        `"${likert.q6 || "N/A"}"`,
+        `"${likert.q7 || "N/A"}"`,
+        `"${likert.q8 || "N/A"}"`,
+        `"${likert.q9 || "N/A"}"`,
+        `"${likert.q10 || "N/A"}"`,
+        `"${likert.q11 || "N/A"}"`,
+        `"${likert.q12 || "N/A"}"`,
+        `"${likert.q13 || "N/A"}"`,
+        `"${likert.q14 || "N/A"}"`,
+        `"${likert.q15 || "N/A"}"`,
+        `"${likert.q16 || "N/A"}"`,
+        `"${likert.q17 || "N/A"}"`,
+        `"${likert.q18 || "N/A"}"`,
+        `"${likert.q19 || "N/A"}"`,
+        `"${likert.q20 || "N/A"}"`,
+        `"${likert.q21 || "N/A"}"`,
         `"${r.createdAt ? new Date(r.createdAt).toISOString() : ""}"`,
       ].join(",");
     });
@@ -71,7 +72,7 @@ export async function GET() {
     return new Response(csvContent, {
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": `attachment; filename="AI_Edu_Survey_Dataset_${new Date().toISOString().split("T")[0]}.csv"`,
+        "Content-Disposition": `attachment; filename="Faculty_AI_Impact_Dataset_${new Date().toISOString().split("T")[0]}.csv"`,
       },
     });
   } catch (error: any) {

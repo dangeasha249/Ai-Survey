@@ -136,7 +136,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               </div>
               <div className="min-w-0">
                 <p className="text-[10px] sm:text-xs font-semibold text-blue-600 uppercase tracking-wide truncate">Target Group</p>
-                <p className="text-xs sm:text-sm font-bold text-slate-800 truncate">Undergraduate</p>
+                <p className="text-xs sm:text-sm font-bold text-slate-800 truncate">Teaching Staff / Faculty</p>
               </div>
             </div>
 

@@ -43,7 +43,7 @@ export const InfoSections: React.FC<InfoSectionsProps> = ({
   const faqs = [
     {
       q: "What is the primary objective of this study?",
-      a: "This study evaluates the adoption, effectiveness, and overall pedagogical impact of Artificial Intelligence tools (like ChatGPT, Gemini, and Grammarly) among undergraduate students across institutions in Maharashtra, India."
+      a: "This study evaluates the adoption, teaching effectiveness, student learning impact, and ethical challenges of Artificial Intelligence tools (like ChatGPT, Gemini, and Copilot) among faculty and teaching staff members across higher education institutions."
     },
     {
       q: "Is my personal identity or response data kept confidential?",
@@ -51,11 +51,11 @@ export const InfoSections: React.FC<InfoSectionsProps> = ({
     },
     {
       q: "Who is eligible to participate in the survey?",
-      a: "Undergraduate students enrolled in B.Sc. CS, B.Sc. IT, BCA, B.Com, B.A., or related higher education programs across Maharashtra."
+      a: "Teaching staff, lecturers, assistant professors, and faculty members across affiliated higher education colleges and universities."
     },
     {
       q: "How long does it take to fill out the questionnaire?",
-      a: "The survey comprises structured multiple-choice questions and takes approximately 10 to 15 minutes to complete."
+      a: "The questionnaire comprises 21 structured questions across 5 sections (A through E) and takes approximately 5 to 7 minutes to complete."
     },
   ];
 

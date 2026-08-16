@@ -35,10 +35,10 @@ function SurveyPageContent() {
               </div>
               <div className="space-y-1.5">
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-                  Sign Up Required
+                  Faculty Sign Up Required
                 </h1>
                 <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
-                  To ensure research dataset integrity and prevent duplicate entries, students must Sign Up / Sign In before filling out the survey form.
+                  To ensure research dataset integrity and prevent duplicate entries, teaching staff members must Sign Up / Sign In before filling out the survey form.
                 </p>
               </div>
 
@@ -72,10 +72,10 @@ function SurveyPageContent() {
               </div>
               <div className="space-y-1.5">
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-                  AI-Edu Impact Survey
+                  AI Impact Survey for Teaching Staff
                 </h1>
                 <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
-                  Your account is verified. Click below to launch the 20-question questionnaire form.
+                  Your account is verified. Click below to launch the 21-question questionnaire form.
                 </p>
               </div>
 
@@ -85,7 +85,7 @@ function SurveyPageContent() {
                   className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-md flex items-center justify-center gap-2 transition"
                 >
                   <FileEdit className="w-4 h-4" />
-                  <span>Start 20-Question Survey</span>
+                  <span>Start 21-Question Survey</span>
                 </button>
               </div>
             </>

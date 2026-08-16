@@ -684,54 +684,26 @@ export const AdminPanel: React.FC = () => {
             <div className="space-y-4 text-xs">
               
               <div className="space-y-1.5 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                <h4 className="font-bold text-slate-800">Academic Profile</h4>
+                <h4 className="font-bold text-slate-800">SECTION A – STAFF PROFILE</h4>
                 <div className="grid grid-cols-2 gap-2 text-slate-600">
-                  <div><strong>Course:</strong> {selectedResponse.course}</div>
-                  <div><strong>Year of Study:</strong> {selectedResponse.year}</div>
-                  <div><strong>Aware of AI:</strong> Yes</div>
-                  <div><strong>Uses AI Tools:</strong> {selectedResponse.usesAI}</div>
+                  <div><strong>Affiliated College:</strong> {selectedResponse.course}</div>
+                  <div><strong>Age Group:</strong> {(selectedResponse as any).q1AgeGroup || (selectedResponse as any).staffProfile?.ageGroup || "N/A"}</div>
+                  <div><strong>Teaching Experience:</strong> {(selectedResponse as any).q2Experience || (selectedResponse as any).staffProfile?.experience || "N/A"}</div>
+                  <div><strong>Highest Qualification:</strong> {(selectedResponse as any).q3Qualification || (selectedResponse as any).staffProfile?.qualification || "N/A"}</div>
+                  <div><strong>Attended AI Workshop:</strong> {(selectedResponse as any).q4Workshop || (selectedResponse as any).staffProfile?.workshop || "N/A"}</div>
+                  <div><strong>Regular AI User:</strong> {selectedResponse.usesAI}</div>
                 </div>
               </div>
 
               <div className="space-y-1.5 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                <h4 className="font-bold text-slate-800">AI Usage & Frequency</h4>
-                <div className="space-y-1 text-slate-600">
-                  <p><strong>Primary Tool:</strong> {selectedResponse.primaryTool}</p>
-                  <p><strong>Usage Frequency:</strong> {selectedResponse.frequency || "N/A"}</p>
-                  {selectedResponse.toolsUsed && selectedResponse.toolsUsed.length > 0 && (
-                    <div>
-                      <strong>All Tools Used:</strong>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {selectedResponse.toolsUsed.map(t => (
-                          <span key={t} className="px-2 py-0.5 bg-white border border-slate-200 text-slate-700 rounded text-[11px] font-medium">
-                            {t}
-                          </span>
-                        ))}
-                      </div>
+                <h4 className="font-bold text-slate-800">Sections B..E Likert Ratings Summary (1..5)</h4>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px] text-slate-700">
+                  {Object.entries((selectedResponse as any).likertRatings || {}).map(([k, val]) => (
+                    <div key={k} className="p-1.5 bg-white border border-slate-200 rounded">
+                      <strong className="uppercase">{k}:</strong> {String(val)} / 5
                     </div>
-                  )}
+                  ))}
                 </div>
-              </div>
-
-              {selectedResponse.challenges && selectedResponse.challenges.length > 0 && (
-                <div className="space-y-1.5 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                  <h4 className="font-bold text-slate-800">Reported Challenges</h4>
-                  <div className="flex flex-wrap gap-1 pt-0.5">
-                    {selectedResponse.challenges.map(ch => (
-                      <span key={ch} className="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200/60 rounded text-[11px]">
-                        {ch}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="space-y-1 p-3.5 bg-slate-50 rounded-xl border border-slate-100 text-slate-600">
-                <h4 className="font-bold text-slate-800 mb-1">Verification & Training</h4>
-                <p><strong>Verifies Information:</strong> {selectedResponse.verify || "N/A"}</p>
-                <p><strong>Attended Workshop:</strong> {selectedResponse.workshop || "N/A"}</p>
-                <p><strong>Needs Formal Training:</strong> {selectedResponse.training || "N/A"}</p>
-                <p><strong>Overall Opinion:</strong> {selectedResponse.opinion || "N/A"}</p>
               </div>
 
             </div>

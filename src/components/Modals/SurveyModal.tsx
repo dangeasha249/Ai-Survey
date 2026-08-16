@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, CheckCircle, Send, ChevronRight, ChevronLeft, Sparkles, AlertCircle, ClipboardCheck, Lock, Edit3, LogIn } from "lucide-react";
+import { X, CheckCircle, Send, ChevronRight, ChevronLeft, Lock, Edit3, LogIn, Award, GraduationCap, Building2, HelpCircle } from "lucide-react";
 import confetti from "canvas-confetti";
 import { useSurvey } from "@/context/SurveyContext";
 import { useAuth } from "@/context/AuthContext";
@@ -32,26 +32,15 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
   const [existingResponseId, setExistingResponseId] = useState<string | null>(null);
   const [loadingExisting, setLoadingExisting] = useState(false);
 
-  // Q1 - Q4
-  const [q1Course, setQ1Course] = useState("");
-  const [q2Year, setQ2Year] = useState("");
-  const [q3Aware, setQ3Aware] = useState("");
-  const [q4UsedAI, setQ4UsedAI] = useState("");
+  // SECTION A – STAFF PROFILE (Q1 - Q5)
+  const [q1AgeGroup, setQ1AgeGroup] = useState("");
+  const [q2Experience, setQ2Experience] = useState("");
+  const [q3Qualification, setQ3Qualification] = useState("");
+  const [q4Workshop, setQ4Workshop] = useState("");
+  const [q5College, setQ5College] = useState("");
 
-  // Q5 - Q7
-  const [q5Tools, setQ5Tools] = useState<string[]>([]);
-  const [q6Frequency, setQ6Frequency] = useState("");
-  const [q7Purposes, setQ7Purposes] = useState<string[]>([]);
-
-  // Q8 - Q15 (Likert Ratings 1..5)
+  // SECTIONS B, C, D, E – LIKERT RATINGS 1..5 (Q6 - Q21)
   const [likertRatings, setLikertRatings] = useState<Record<string, number>>({});
-
-  // Q16 - Q20
-  const [q16Challenges, setQ16Challenges] = useState<string[]>([]);
-  const [q17Verify, setQ17Verify] = useState("");
-  const [q18Workshop, setQ18Workshop] = useState("");
-  const [q19NeedTraining, setQ19NeedTraining] = useState("");
-  const [q20OverallOpinion, setQ20OverallOpinion] = useState("");
 
   // Fetch existing survey if user is logged in
   useEffect(() => {
@@ -71,19 +60,12 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
               setIsEditing(true);
               setExistingResponseId(r.responseId);
 
-              setQ1Course(ans.q1Course || r.course || "");
-              setQ2Year(ans.q2Year || "");
-              setQ3Aware(ans.q3Aware || "Yes");
-              setQ4UsedAI(ans.q4UsedAI || r.usesAI || "Yes");
-              setQ5Tools(ans.q5Tools || (r.primaryTool ? [r.primaryTool] : []));
-              setQ6Frequency(ans.q6Frequency || "Daily");
-              setQ7Purposes(ans.q7Purposes || []);
+              setQ1AgeGroup(ans.q1AgeGroup || ans.staffProfile?.ageGroup || "");
+              setQ2Experience(ans.q2Experience || ans.staffProfile?.experience || "");
+              setQ3Qualification(ans.q3Qualification || ans.staffProfile?.qualification || "");
+              setQ4Workshop(ans.q4Workshop || ans.staffProfile?.workshop || "");
+              setQ5College(ans.q5College || r.course || "");
               setLikertRatings(ans.likertRatings || {});
-              setQ16Challenges(ans.q16Challenges || []);
-              setQ17Verify(ans.q17Verify || "");
-              setQ18Workshop(ans.q18Workshop || "");
-              setQ19NeedTraining(ans.q19NeedTraining || "");
-              setQ20OverallOpinion(ans.q20OverallOpinion || "");
             }
           }
         } catch {
@@ -114,49 +96,51 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
   if (!isOpen) return null;
 
   const stepsList = [
-    { id: 1, label: "1. Profile & Awareness" },
-    { id: 2, label: "2. Tools & Usage" },
-    { id: 3, label: "3. Learning Impact" },
-    { id: 4, label: "4. Challenges & Opinion" },
+    { id: 1, label: "A. Staff Profile" },
+    { id: 2, label: "B. AI Awareness & Usage" },
+    { id: 3, label: "C. Impact on Teaching" },
+    { id: 4, label: "D. Student Learning" },
+    { id: 5, label: "E. Benefits & Ethics" },
   ];
-
-  const handleMultiSelect = (setter: React.Dispatch<React.SetStateAction<string[]>>, val: string) => {
-    setter(prev => prev.includes(val) ? prev.filter(item => item !== val) : [...prev, val]);
-  };
 
   const handleLikertChange = (key: string, val: number) => {
     setLikertRatings(prev => ({ ...prev, [key]: val }));
   };
 
-  // Validation per step
+  // Step Validation
   const validateStep = (step: number): boolean => {
     setSectionError(null);
     if (step === 1) {
-      if (!q1Course || !q2Year || !q3Aware || !q4UsedAI) {
-        setSectionError("Please answer all 4 questions in Step 1 before continuing.");
+      if (!q1AgeGroup || !q2Experience || !q3Qualification || !q4Workshop || !q5College.trim()) {
+        setSectionError("Please answer all 5 Staff Profile questions before continuing.");
         return false;
       }
     } else if (step === 2) {
-      if (q4UsedAI === "Yes") {
-        if (q5Tools.length === 0 || !q6Frequency || q7Purposes.length === 0) {
-          setSectionError("Please answer all questions in Step 2 regarding your AI usage.");
-          return false;
-        }
+      const keys = ["q6", "q7", "q8", "q9"];
+      const missing = keys.filter(k => !likertRatings[k]);
+      if (missing.length > 0) {
+        setSectionError("Please rate all 4 statements in Section B regarding your AI awareness and usage.");
+        return false;
       }
     } else if (step === 3) {
-      const likertKeys = ["q8", "q9", "q10", "q11", "q12", "q13", "q14", "q15"];
-      const missing = likertKeys.filter(k => !likertRatings[k]);
+      const keys = ["q10", "q11", "q12", "q13", "q14"];
+      const missing = keys.filter(k => !likertRatings[k]);
       if (missing.length > 0) {
-        setSectionError("Please provide a rating for all 8 impact statements in Step 3.");
+        setSectionError("Please rate all 5 statements in Section C regarding teaching impact.");
         return false;
       }
     } else if (step === 4) {
-      if (!q17Verify || !q18Workshop || !q19NeedTraining || !q20OverallOpinion) {
-        setSectionError("Please complete all questions in Step 4 before submitting.");
+      const keys = ["q15", "q16", "q17", "q18"];
+      const missing = keys.filter(k => !likertRatings[k]);
+      if (missing.length > 0) {
+        setSectionError("Please rate all 4 statements in Section D regarding student learning.");
         return false;
       }
-      if (q4UsedAI === "Yes" && q16Challenges.length === 0) {
-        setSectionError("Please select at least one challenge option in Q16.");
+    } else if (step === 5) {
+      const keys = ["q19", "q20", "q21"];
+      const missing = keys.filter(k => !likertRatings[k]);
+      if (missing.length > 0) {
+        setSectionError("Please rate all 3 statements in Section E regarding benefits, challenges and ethics.");
         return false;
       }
     }
@@ -165,14 +149,14 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
 
   const handleNextStep = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(4, prev + 1));
+      setCurrentStep(prev => Math.min(5, prev + 1));
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateStep(4)) return;
+    if (!validateStep(5)) return;
 
     setSubmitError(null);
 
@@ -184,23 +168,23 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
 
     const payload = {
       userEmail: user?.email,
-      course: q1Course,
-      usesAI: q4UsedAI,
-      primaryTool: q5Tools[0] || "ChatGPT",
+      course: q5College,
+      usesAI: (likertRatings["q8"] && likertRatings["q8"] >= 3) ? "Yes" : "No",
+      primaryTool: "ChatGPT / Gemini / Copilot",
       impactRating: Math.max(1, Math.min(5, Math.round(avgScore))),
-      q1Course,
-      q2Year,
-      q3Aware,
-      q4UsedAI,
-      q5Tools,
-      q6Frequency,
-      q7Purposes,
+      q1AgeGroup,
+      q2Experience,
+      q3Qualification,
+      q4Workshop,
+      q5College,
       likertRatings,
-      q16Challenges,
-      q17Verify,
-      q18Workshop,
-      q19NeedTraining,
-      q20OverallOpinion,
+      staffProfile: {
+        ageGroup: q1AgeGroup,
+        experience: q2Experience,
+        qualification: q3Qualification,
+        workshop: q4Workshop,
+        college: q5College,
+      },
     };
 
     const success = await addSurveyResponse(payload);
@@ -242,13 +226,13 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
 
           <div className="space-y-2">
             <h3 className="text-xl font-extrabold text-slate-900">
-              Sign In Required
+              Faculty Sign In Required
             </h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Please sign in or create an account to participate in the AI Impact Survey.
+              Please sign in or create a teaching staff account to participate in the AI Impact Questionnaire.
             </p>
             <p className="text-[11px] text-slate-400">
-              Each account can submit the survey once and update their saved response anytime.
+              Each faculty account can submit the survey once and update their saved response anytime.
             </p>
           </div>
 
@@ -275,16 +259,64 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
     { label: "Strongly Disagree", val: 1 },
   ];
 
-  const likertQuestions = [
-    { key: "q8", text: "8. Do AI tools help you understand difficult concepts?" },
-    { key: "q9", text: "9. Do AI tools help you save time in academic work?" },
-    { key: "q10", text: "10. Do AI tools improve your learning?" },
-    { key: "q11", text: "11. Do AI tools improve your problem-solving skills?" },
-    { key: "q12", text: "12. Do AI tools improve your academic performance?" },
-    { key: "q13", text: "13. Do AI tools help you learn independently?" },
-    { key: "q14", text: "14. Do AI tools make learning more interesting?" },
-    { key: "q15", text: "15. Do AI tools help teachers explain difficult concepts?" },
+  const sectionBQuestions = [
+    { key: "q6", text: "6. I have sufficient knowledge about Artificial Intelligence and its educational applications." },
+    { key: "q7", text: "7. I am familiar with AI tools such as ChatGPT, Gemini, Copilot and other AI tools." },
+    { key: "q8", text: "8. I regularly use AI tools for academic and teaching-related activities." },
+    { key: "q9", text: "9. I use AI tools for preparing notes, presentations, assignments, quizzes or question papers." },
   ];
+
+  const sectionCQuestions = [
+    { key: "q10", text: "10. AI tools help me explain difficult concepts more effectively." },
+    { key: "q11", text: "11. AI helps me prepare teaching materials in less time." },
+    { key: "q12", text: "12. AI tools improve the quality and effectiveness of my teaching." },
+    { key: "q13", text: "13. AI makes my classroom teaching more interactive and engaging." },
+    { key: "q14", text: "14. AI helps me provide quick and personalized support to students." },
+  ];
+
+  const sectionDQuestions = [
+    { key: "q15", text: "15. AI tools help students understand difficult concepts more easily." },
+    { key: "q16", text: "16. AI encourages students to learn independently and explore additional resources." },
+    { key: "q17", text: "17. AI improves students’ problem-solving, creativity and critical-thinking skills." },
+    { key: "q18", text: "18. AI can improve students’ academic performance and learning outcomes." },
+  ];
+
+  const sectionEQuestions = [
+    { key: "q19", text: "19. AI reduces teachers’ workload and improves overall productivity." },
+    { key: "q20", text: "20. Overdependence on AI may negatively affect students’ independent thinking and academic integrity." },
+    { key: "q21", text: "21. Colleges should provide AI training and develop clear guidelines for the responsible and ethical use of AI in education." },
+  ];
+
+  const renderLikertGroup = (questions: { key: string; text: string }[]) => (
+    <div className="space-y-6">
+      {questions.map((q) => (
+        <div key={q.key} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
+          <label className="block text-xs sm:text-sm font-bold text-slate-800 leading-relaxed">
+            {q.text} *
+          </label>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            {likertOptions.map((opt) => {
+              const isSelected = likertRatings[q.key] === opt.val;
+              return (
+                <button
+                  key={opt.val}
+                  type="button"
+                  onClick={() => handleLikertChange(q.key, opt.val)}
+                  className={`p-2.5 rounded-xl text-xs font-bold border transition flex flex-col items-center justify-center gap-1 ${
+                    isSelected
+                      ? "bg-blue-600 text-white border-blue-600 shadow-md scale-[1.02]"
+                      : "bg-white border-slate-200 text-slate-700 hover:bg-slate-100"
+                  }`}
+                >
+                  <span>{opt.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 animate-fade-in">
@@ -294,14 +326,14 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
         <div className="sticky top-0 z-20 bg-slate-900 text-white px-5 sm:px-8 py-4 flex items-center justify-between shadow-md">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0 shadow-sm">
-              <ClipboardCheck className="w-5 h-5" />
+              <GraduationCap className="w-5 h-5" />
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-extrabold tracking-tight">
-                AI-Edu Impact Survey (20 Questions)
+                AI Impact Questionnaire for Teaching Staff (21 Questions)
               </h2>
               <p className="text-xs text-slate-300">
-                Step {currentStep} of 4 • Confidential & Academic
+                Step {currentStep} of 5 • Confidential & Academic Study
               </p>
             </div>
           </div>
@@ -320,7 +352,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
           <div className="bg-emerald-50 border-b border-emerald-100 px-5 sm:px-8 py-2 flex items-center justify-between text-xs font-bold text-emerald-800">
             <div className="flex items-center gap-2">
               <Edit3 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span>Editing Previously Saved Survey Response ({existingResponseId})</span>
+              <span>Editing Previously Saved Response ({existingResponseId})</span>
             </div>
             <span className="hidden sm:inline-block text-[10px] bg-emerald-200/60 text-emerald-900 px-2.5 py-0.5 rounded-full">
               Single Account Sync
@@ -330,43 +362,43 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
 
         {/* Progress Step Bar */}
         <div className="bg-slate-100 px-4 sm:px-8 py-3 border-b border-slate-200 shrink-0">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {stepsList.map(step => (
+          <div className="grid grid-cols-5 gap-1 text-center">
+            {stepsList.map((st) => (
               <button
-                key={step.id}
+                key={st.id}
                 type="button"
                 onClick={() => {
-                  if (step.id < currentStep || validateStep(currentStep)) {
-                    setCurrentStep(step.id);
+                  if (st.id < currentStep || validateStep(currentStep)) {
+                    setCurrentStep(st.id);
                   }
                 }}
-                className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
-                  currentStep === step.id
+                className={`py-1.5 px-1 rounded-xl text-[10px] sm:text-xs font-bold transition truncate ${
+                  currentStep === st.id
                     ? "bg-blue-600 text-white shadow-sm"
-                    : step.id < currentStep
-                    ? "bg-emerald-100 text-emerald-800"
-                    : "bg-white text-slate-600 border border-slate-200"
+                    : st.id < currentStep
+                    ? "bg-blue-100 text-blue-800"
+                    : "bg-slate-200/60 text-slate-500 hover:bg-slate-200"
                 }`}
               >
-                <span>{step.label}</span>
+                {st.label}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Content Body */}
-        <div className="p-5 sm:p-8 overflow-y-auto space-y-6">
+        {/* Scrollable Form Body */}
+        <div className="p-5 sm:p-8 overflow-y-auto flex-1 space-y-6">
           
           {sectionError && (
-            <div className="p-3.5 bg-red-50 border border-red-200 rounded-xl text-xs font-semibold text-red-700 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
+            <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center gap-2 animate-shake">
+              <HelpCircle className="w-4 h-4 text-red-500 shrink-0" />
               <span>{sectionError}</span>
             </div>
           )}
 
           {submitError && (
-            <div className="p-3.5 bg-red-50 border border-red-200 rounded-xl text-xs font-semibold text-red-700 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
+            <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center gap-2">
+              <HelpCircle className="w-4 h-4 text-red-500 shrink-0" />
               <span>{submitError}</span>
             </div>
           )}
@@ -374,379 +406,30 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
           {!submitted ? (
             <form onSubmit={handleSubmit} className="space-y-6">
               
-              {/* STEP 1: Profile & Awareness (Q1..Q4) */}
+              {/* STEP 1: SECTION A – STAFF PROFILE */}
               {currentStep === 1 && (
-                <div className="space-y-6 animate-fade-in">
-                  <div className="border-b pb-2 border-slate-100">
-                    <h3 className="text-base font-extrabold text-slate-900">
-                      Step 1: Student Profile & AI Awareness
+                <div className="space-y-5 animate-fade-in">
+                  <div className="pb-2 border-b border-slate-100">
+                    <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                      <GraduationCap className="w-5 h-5 text-blue-600" />
+                      <span>SECTION A – STAFF PROFILE</span>
                     </h3>
-                    <p className="text-xs text-slate-500">Please answer questions 1 to 4</p>
+                    <p className="text-xs text-slate-500">Please provide your background teaching profile details.</p>
                   </div>
 
-                  {/* Q1 */}
+                  {/* Q1: Age Group */}
                   <div className="space-y-2">
                     <label className="block text-xs sm:text-sm font-bold text-slate-800">
-                      1. What is your course? *
-                    </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                      {["B.Sc. Computer Science", "B.Sc. Information Technology", "BCA", "B.Com", "B.A.", "Other"].map(course => (
-                        <button
-                          key={course}
-                          type="button"
-                          onClick={() => setQ1Course(course)}
-                          className={`p-3 rounded-xl text-xs font-bold border text-left transition ${
-                            q1Course === course
-                              ? "bg-blue-50 border-blue-600 text-blue-700 shadow-sm"
-                              : "bg-slate-50/70 border-slate-200 text-slate-700 hover:bg-slate-100"
-                          }`}
-                        >
-                          {course}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Q2 */}
-                  <div className="space-y-2">
-                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
-                      2. What is your year of study? *
+                      1. What is your age group? *
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                      {["First Year", "Second Year", "Third Year", "Final Year"].map(yr => (
+                      {["Below 30", "31–40", "41–50", "Above 50"].map((opt) => (
                         <button
-                          key={yr}
+                          key={opt}
                           type="button"
-                          onClick={() => setQ2Year(yr)}
+                          onClick={() => setQ1AgeGroup(opt)}
                           className={`p-3 rounded-xl text-xs font-bold border text-center transition ${
-                            q2Year === yr
-                              ? "bg-blue-50 border-blue-600 text-blue-700 shadow-sm"
-                              : "bg-slate-50/70 border-slate-200 text-slate-700 hover:bg-slate-100"
-                          }`}
-                        >
-                          {yr}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Q3 */}
-                  <div className="space-y-2">
-                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
-                      3. Are you aware of Artificial Intelligence (AI) tools? *
-                    </label>
-                    <div className="flex gap-3">
-                      {["Yes", "No"].map(opt => (
-                        <button
-                          key={opt}
-                          type="button"
-                          onClick={() => setQ3Aware(opt)}
-                          className={`px-6 py-2.5 rounded-xl text-xs font-bold border transition ${
-                            q3Aware === opt
-                              ? "bg-blue-600 text-white border-blue-600"
-                              : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
-                          }`}
-                        >
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Q4 */}
-                  <div className="space-y-2">
-                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
-                      4. Have you used AI tools for your studies? *
-                    </label>
-                    <div className="flex gap-3">
-                      {["Yes", "No"].map(opt => (
-                        <button
-                          key={opt}
-                          type="button"
-                          onClick={() => setQ4UsedAI(opt)}
-                          className={`px-6 py-2.5 rounded-xl text-xs font-bold border transition ${
-                            q4UsedAI === opt
-                              ? "bg-blue-600 text-white border-blue-600"
-                              : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
-                          }`}
-                        >
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                </div>
-              )}
-
-              {/* STEP 2: Tools & Usage (Q5..Q7) */}
-              {currentStep === 2 && (
-                <div className="space-y-6 animate-fade-in">
-                  <div className="border-b pb-2 border-slate-100">
-                    <h3 className="text-base font-extrabold text-slate-900">
-                      Step 2: AI Tools & Usage Pattern
-                    </h3>
-                    <p className="text-xs text-slate-500">Please answer questions 5 to 7</p>
-                  </div>
-
-                  {/* Q5 */}
-                  <div className="space-y-2">
-                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
-                      5. Which AI tools do you use? (Select all that apply) *
-                    </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                      {["ChatGPT", "Google Gemini", "Microsoft Copilot", "Grammarly", "QuillBot", "Perplexity", "Other"].map(tool => {
-                        const isSelected = q5Tools.includes(tool);
-                        return (
-                          <button
-                            key={tool}
-                            type="button"
-                            onClick={() => handleMultiSelect(setQ5Tools, tool)}
-                            className={`p-3 rounded-xl text-xs font-bold border text-left transition flex items-center justify-between ${
-                              isSelected
-                                ? "bg-blue-50 border-blue-600 text-blue-700 shadow-sm"
-                                : "bg-slate-50/70 border-slate-200 text-slate-700 hover:bg-slate-100"
-                            }`}
-                          >
-                            <span>{tool}</span>
-                            {isSelected && <span className="w-2 h-2 rounded-full bg-blue-600" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Q6 */}
-                  <div className="space-y-2">
-                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
-                      6. How often do you use AI tools? *
-                    </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                      {["Daily", "Several times a week", "Weekly", "Occasionally", "Rarely", "Never"].map(freq => (
-                        <button
-                          key={freq}
-                          type="button"
-                          onClick={() => setQ6Frequency(freq)}
-                          className={`p-3 rounded-xl text-xs font-bold border text-left transition ${
-                            q6Frequency === freq
-                              ? "bg-blue-50 border-blue-600 text-blue-700 shadow-sm"
-                              : "bg-slate-50/70 border-slate-200 text-slate-700 hover:bg-slate-100"
-                          }`}
-                        >
-                          {freq}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Q7 */}
-                  <div className="space-y-2">
-                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
-                      7. For what purpose do you use AI tools? (Select all that apply) *
-                    </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      {[
-                        "Understanding concepts",
-                        "Assignments",
-                        "Project work",
-                        "Programming/Coding",
-                        "Exam preparation",
-                        "Research work",
-                        "Presentation preparation",
-                        "Other",
-                      ].map(purp => {
-                        const isSelected = q7Purposes.includes(purp);
-                        return (
-                          <button
-                            key={purp}
-                            type="button"
-                            onClick={() => handleMultiSelect(setQ7Purposes, purp)}
-                            className={`p-3 rounded-xl text-xs font-bold border text-left transition flex items-center justify-between ${
-                              isSelected
-                                ? "bg-blue-50 border-blue-600 text-blue-700 shadow-sm"
-                                : "bg-slate-50/70 border-slate-200 text-slate-700 hover:bg-slate-100"
-                            }`}
-                          >
-                            <span>{purp}</span>
-                            {isSelected && <span className="w-2 h-2 rounded-full bg-blue-600" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                </div>
-              )}
-
-              {/* STEP 3: Impact on Learning & Teaching (Q8..Q15) */}
-              {currentStep === 3 && (
-                <div className="space-y-6 animate-fade-in">
-                  <div className="border-b pb-2 border-slate-100">
-                    <h3 className="text-base font-extrabold text-slate-900">
-                      Step 3: Impact on Learning & Teaching (Likert Scale)
-                    </h3>
-                    <p className="text-xs text-slate-500">Rate statements 8 to 15 on a 5-point scale</p>
-                  </div>
-
-                  <div className="space-y-5">
-                    {likertQuestions.map(q => (
-                      <div key={q.key} className="p-4 bg-slate-50/80 border border-slate-200 rounded-2xl space-y-3">
-                        <label className="block text-xs sm:text-sm font-bold text-slate-800">
-                          {q.text} *
-                        </label>
-                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                          {likertOptions.map(opt => {
-                            const isSelected = likertRatings[q.key] === opt.val;
-                            return (
-                              <button
-                                key={opt.val}
-                                type="button"
-                                onClick={() => handleLikertChange(q.key, opt.val)}
-                                className={`px-2 py-2 rounded-xl text-[11px] font-bold border text-center transition ${
-                                  isSelected
-                                    ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                                    : "bg-white border-slate-200 text-slate-700 hover:bg-slate-100"
-                                }`}
-                              >
-                                {opt.label}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* STEP 4: Challenges, Verification & Opinion (Q16..Q20) */}
-              {currentStep === 4 && (
-                <div className="space-y-6 animate-fade-in">
-                  <div className="border-b pb-2 border-slate-100">
-                    <h3 className="text-base font-extrabold text-slate-900">
-                      Step 4: Challenges, Verification & Overall Opinion
-                    </h3>
-                    <p className="text-xs text-slate-500">Please answer final questions 16 to 20</p>
-                  </div>
-
-                  {/* Q16 */}
-                  <div className="space-y-2">
-                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
-                      16. What challenges do you face while using AI tools? (Select all that apply) *
-                    </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      {[
-                        "Incorrect Information",
-                        "Overdependence on AI",
-                        "Plagiarism Concern",
-                        "Lack of AI Knowledge",
-                        "Privacy Concern",
-                        "Internet/Technical Problems",
-                        "Difficulty in verifying information",
-                        "No major challenge",
-                      ].map(ch => {
-                        const isSelected = q16Challenges.includes(ch);
-                        return (
-                          <button
-                            key={ch}
-                            type="button"
-                            onClick={() => handleMultiSelect(setQ16Challenges, ch)}
-                            className={`p-3 rounded-xl text-xs font-bold border text-left transition flex items-center justify-between ${
-                              isSelected
-                                ? "bg-blue-50 border-blue-600 text-blue-700 shadow-sm"
-                                : "bg-slate-50/70 border-slate-200 text-slate-700 hover:bg-slate-100"
-                            }`}
-                          >
-                            <span>{ch}</span>
-                            {isSelected && <span className="w-2 h-2 rounded-full bg-blue-600" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Q17 */}
-                  <div className="space-y-2">
-                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
-                      17. Do you verify AI-generated information before using it? *
-                    </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                      {["Always", "Often", "Sometimes", "Rarely", "Never"].map(opt => (
-                        <button
-                          key={opt}
-                          type="button"
-                          onClick={() => setQ17Verify(opt)}
-                          className={`p-2.5 rounded-xl text-xs font-bold border text-center transition ${
-                            q17Verify === opt
-                              ? "bg-blue-600 text-white border-blue-600"
-                              : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
-                          }`}
-                        >
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Q18 */}
-                  <div className="space-y-2">
-                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
-                      18. Have you attended any AI-related workshop or training? *
-                    </label>
-                    <div className="flex gap-3">
-                      {["Yes", "No"].map(opt => (
-                        <button
-                          key={opt}
-                          type="button"
-                          onClick={() => setQ18Workshop(opt)}
-                          className={`px-6 py-2.5 rounded-xl text-xs font-bold border transition ${
-                            q18Workshop === opt
-                              ? "bg-blue-600 text-white border-blue-600"
-                              : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
-                          }`}
-                        >
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Q19 */}
-                  <div className="space-y-2">
-                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
-                      19. Do you think students need formal training in AI tools? *
-                    </label>
-                    <div className="flex gap-3">
-                      {["Yes", "No", "Not Sure"].map(opt => (
-                        <button
-                          key={opt}
-                          type="button"
-                          onClick={() => setQ19NeedTraining(opt)}
-                          className={`px-5 py-2.5 rounded-xl text-xs font-bold border transition ${
-                            q19NeedTraining === opt
-                              ? "bg-blue-600 text-white border-blue-600"
-                              : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
-                          }`}
-                        >
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Q20 */}
-                  <div className="space-y-2">
-                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
-                      20. Overall, what is your opinion about the use of AI tools in higher education? *
-                    </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                      {["Very Positive", "Positive", "Neutral", "Negative", "Very Negative"].map(opt => (
-                        <button
-                          key={opt}
-                          type="button"
-                          onClick={() => setQ20OverallOpinion(opt)}
-                          className={`p-2.5 rounded-xl text-xs font-bold border text-center transition ${
-                            q20OverallOpinion === opt
+                            q1AgeGroup === opt
                               ? "bg-blue-600 text-white border-blue-600 shadow-sm"
                               : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
                           }`}
@@ -757,10 +440,147 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                     </div>
                   </div>
 
+                  {/* Q2: Teaching Experience */}
+                  <div className="space-y-2">
+                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
+                      2. What is your teaching experience? *
+                    </label>
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                      {["Below 5 Years", "5–10 Years", "11–15 Years", "16–20 Years", "Above 20 Years"].map((opt) => (
+                        <button
+                          key={opt}
+                          type="button"
+                          onClick={() => setQ2Experience(opt)}
+                          className={`p-2.5 rounded-xl text-xs font-bold border text-center transition ${
+                            q2Experience === opt
+                              ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                              : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
+                          }`}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Q3: Highest Educational Qualification */}
+                  <div className="space-y-2">
+                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
+                      3. What is your highest educational qualification? *
+                    </label>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                      {["Master’s Degree", "M.Phil.", "Ph.D.", "Other"].map((opt) => (
+                        <button
+                          key={opt}
+                          type="button"
+                          onClick={() => setQ3Qualification(opt)}
+                          className={`p-3 rounded-xl text-xs font-bold border text-center transition ${
+                            q3Qualification === opt
+                              ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                              : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
+                          }`}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Q4: AI Workshop / Training */}
+                  <div className="space-y-2">
+                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
+                      4. Have you attended any AI-related workshop or training? *
+                    </label>
+                    <div className="flex gap-3">
+                      {["Yes", "No"].map((opt) => (
+                        <button
+                          key={opt}
+                          type="button"
+                          onClick={() => setQ4Workshop(opt)}
+                          className={`px-6 py-2.5 rounded-xl text-xs font-bold border transition ${
+                            q4Workshop === opt
+                              ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                              : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
+                          }`}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Q5: Name of Affiliated College */}
+                  <div className="space-y-2">
+                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
+                      5. Name of the Affiliated College *
+                    </label>
+                    <div className="relative">
+                      <Building2 className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+                      <input
+                        type="text"
+                        value={q5College}
+                        onChange={(e) => setQ5College(e.target.value)}
+                        placeholder="e.g. Government Degree College / Arts & Commerce College"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
 
-              {/* Wizard Bottom Bar */}
+              {/* STEP 2: SECTION B – AI AWARENESS & USAGE */}
+              {currentStep === 2 && (
+                <div className="space-y-5 animate-fade-in">
+                  <div className="pb-2 border-b border-slate-100">
+                    <h3 className="text-base font-extrabold text-slate-900">
+                      SECTION B – AI AWARENESS & USAGE
+                    </h3>
+                    <p className="text-xs text-slate-500">Rate your agreement with each awareness & usage statement (1 = Strongly Disagree, 5 = Strongly Agree).</p>
+                  </div>
+                  {renderLikertGroup(sectionBQuestions)}
+                </div>
+              )}
+
+              {/* STEP 3: SECTION C – IMPACT ON TEACHING */}
+              {currentStep === 3 && (
+                <div className="space-y-5 animate-fade-in">
+                  <div className="pb-2 border-b border-slate-100">
+                    <h3 className="text-base font-extrabold text-slate-900">
+                      SECTION C – IMPACT ON TEACHING
+                    </h3>
+                    <p className="text-xs text-slate-500">Rate your agreement with how AI impacts your teaching effectiveness (1 = Strongly Disagree, 5 = Strongly Agree).</p>
+                  </div>
+                  {renderLikertGroup(sectionCQuestions)}
+                </div>
+              )}
+
+              {/* STEP 4: SECTION D – IMPACT ON STUDENT LEARNING */}
+              {currentStep === 4 && (
+                <div className="space-y-5 animate-fade-in">
+                  <div className="pb-2 border-b border-slate-100">
+                    <h3 className="text-base font-extrabold text-slate-900">
+                      SECTION D – IMPACT ON STUDENT LEARNING
+                    </h3>
+                    <p className="text-xs text-slate-500">Rate your agreement with how AI affects student learning outcomes (1 = Strongly Disagree, 5 = Strongly Agree).</p>
+                  </div>
+                  {renderLikertGroup(sectionDQuestions)}
+                </div>
+              )}
+
+              {/* STEP 5: SECTION E – BENEFITS, CHALLENGES & ETHICS */}
+              {currentStep === 5 && (
+                <div className="space-y-5 animate-fade-in">
+                  <div className="pb-2 border-b border-slate-100">
+                    <h3 className="text-base font-extrabold text-slate-900">
+                      SECTION E – BENEFITS, CHALLENGES & ETHICS
+                    </h3>
+                    <p className="text-xs text-slate-500">Rate your agreement regarding productivity, challenges and ethical guidelines (1 = Strongly Disagree, 5 = Strongly Agree).</p>
+                  </div>
+                  {renderLikertGroup(sectionEQuestions)}
+                </div>
+              )}
+
+              {/* Wizard Bottom Navigation Bar */}
               <div className="pt-4 border-t border-slate-200 flex justify-between items-center gap-3">
                 {currentStep > 1 ? (
                   <button
@@ -773,7 +593,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                   </button>
                 ) : <div />}
 
-                {currentStep < 4 ? (
+                {currentStep < 5 ? (
                   <button
                     type="button"
                     onClick={handleNextStep}
@@ -788,7 +608,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                     className="px-7 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-lg flex items-center gap-2 transition"
                   >
                     <Send className="w-4 h-4" />
-                    <span>{isEditing ? "Update My Saved Survey Answers" : "Submit 20-Question Survey"}</span>
+                    <span>{isEditing ? "Update Saved Questionnaire" : "Submit 21-Question Survey"}</span>
                   </button>
                 )}
               </div>
@@ -801,12 +621,12 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                 <CheckCircle className="w-10 h-10" />
               </div>
               <h3 className="text-2xl font-extrabold text-slate-900">
-                {isEditing ? "Survey Updated Successfully!" : "Survey Submitted Successfully!"}
+                {isEditing ? "Faculty Survey Updated Successfully!" : "Faculty Survey Submitted Successfully!"}
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                 {isEditing
-                  ? "Your previous survey response has been updated successfully in the MongoDB database."
-                  : "Thank you for completing all 20 questions of the AI-Edu Impact Survey. Your response has been recorded."}
+                  ? "Your teaching staff survey responses have been updated successfully in the MongoDB database."
+                  : "Thank you for completing all 21 questions of the AI Impact Questionnaire for Teaching Staff."}
               </p>
               <button
                 onClick={handleReset}
