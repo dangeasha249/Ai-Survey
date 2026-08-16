@@ -24,6 +24,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const navItems = [
     { id: "home", label: "Home" },
+    { id: "analytics", label: "Analytics & Insights" },
     { id: "about", label: "About Study" },
     { id: "contact", label: "Contact" },
   ];
@@ -42,6 +43,7 @@ export const Header: React.FC<HeaderProps> = ({
   const handleNavClick = (id: string) => {
     const routes: Record<string, string> = {
       home: "/",
+      analytics: "/analytics",
       about: "/about",
       survey: "/survey",
       instructions: "/instructions",
