@@ -5,7 +5,6 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { InfoSections } from "@/components/Sections/InfoSections";
-import { Footer } from "@/components/Footer";
 import { SurveyModal } from "@/components/Modals/SurveyModal";
 import { ProfileModal } from "@/components/Modals/ProfileModal";
 import { AuthModal } from "@/components/Modals/AuthModal";
@@ -69,8 +68,7 @@ function MainContent() {
         />
       </main>
 
-      {/* 5. Footer */}
-      <Footer />
+
 
       {/* ------------ MODALS ------------ */}
       {/* Student Survey Form Modal */}

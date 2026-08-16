@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 
 interface PageLayoutProps {
@@ -23,7 +22,6 @@ function PageContent({ activeSection, children }: PageLayoutProps) {
         onOpenProfile={() => goHome()}
       />
       <main className="flex-1">{children}</main>
-      <Footer />
     </div>
   );
 }

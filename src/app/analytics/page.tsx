@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { MetricCards } from "@/components/Dashboard/MetricCards";
 import { AnalyticsCharts } from "@/components/Dashboard/AnalyticsCharts";
 import { DetailsModal } from "@/components/Modals/DetailsModal";
@@ -174,8 +173,7 @@ function AnalyticsContent() {
 
       </main>
 
-      {/* 5. Footer */}
-      <Footer />
+
 
       {/* ------------ MODALS ------------ */}
       <SurveyModal
