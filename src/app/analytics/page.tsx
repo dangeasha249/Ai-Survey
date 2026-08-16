@@ -91,20 +91,8 @@ function AnalyticsContent() {
       <main className="flex-1 w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 py-8 space-y-8 animate-fade-in">
         
         {/* Page Header Section - Natural Academic Design */}
-        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/90 shadow-sm space-y-2.5">
+        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/90 shadow-sm space-y-2">
           
-          <div className="flex flex-wrap items-center gap-2.5">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/70">
-              <BarChart3 className="w-3.5 h-3.5 text-blue-600" />
-              <span>Empirical Research Dashboard</span>
-            </span>
-
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Live MongoDB Sync</span>
-            </span>
-          </div>
-
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Research Analytics & Insights
           </h1>
