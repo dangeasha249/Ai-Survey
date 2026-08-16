@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, CheckCircle, Send, ChevronRight, ChevronLeft, Lock, Edit3, LogIn, Award, GraduationCap, Building2, HelpCircle } from "lucide-react";
+import { X, CheckCircle, Send, ChevronRight, ChevronLeft, Lock, Edit3, LogIn, GraduationCap, Building2, HelpCircle } from "lucide-react";
 import confetti from "canvas-confetti";
 import { useSurvey } from "@/context/SurveyContext";
 import { useAuth } from "@/context/AuthContext";
@@ -112,35 +112,35 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
     setSectionError(null);
     if (step === 1) {
       if (!q1AgeGroup || !q2Experience || !q3Qualification || !q4Workshop || !q5College.trim()) {
-        setSectionError("Please answer all 5 Staff Profile questions before continuing.");
+        setSectionError("Please answer all 5 Staff Profile dropdown fields before continuing.");
         return false;
       }
     } else if (step === 2) {
       const keys = ["q6", "q7", "q8", "q9"];
       const missing = keys.filter(k => !likertRatings[k]);
       if (missing.length > 0) {
-        setSectionError("Please rate all 4 statements in Section B regarding your AI awareness and usage.");
+        setSectionError("Please select a rating dropdown for all 4 statements in Section B.");
         return false;
       }
     } else if (step === 3) {
       const keys = ["q10", "q11", "q12", "q13", "q14"];
       const missing = keys.filter(k => !likertRatings[k]);
       if (missing.length > 0) {
-        setSectionError("Please rate all 5 statements in Section C regarding teaching impact.");
+        setSectionError("Please select a rating dropdown for all 5 statements in Section C.");
         return false;
       }
     } else if (step === 4) {
       const keys = ["q15", "q16", "q17", "q18"];
       const missing = keys.filter(k => !likertRatings[k]);
       if (missing.length > 0) {
-        setSectionError("Please rate all 4 statements in Section D regarding student learning.");
+        setSectionError("Please select a rating dropdown for all 4 statements in Section D.");
         return false;
       }
     } else if (step === 5) {
       const keys = ["q19", "q20", "q21"];
       const missing = keys.filter(k => !likertRatings[k]);
       if (missing.length > 0) {
-        setSectionError("Please rate all 3 statements in Section E regarding benefits, challenges and ethics.");
+        setSectionError("Please select a rating dropdown for all 3 statements in Section E.");
         return false;
       }
     }
@@ -251,14 +251,6 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
     );
   }
 
-  const likertOptions = [
-    { label: "Strongly Agree", val: 5 },
-    { label: "Agree", val: 4 },
-    { label: "Neutral", val: 3 },
-    { label: "Disagree", val: 2 },
-    { label: "Strongly Disagree", val: 1 },
-  ];
-
   const sectionBQuestions = [
     { key: "q6", text: "6. I have sufficient knowledge about Artificial Intelligence and its educational applications." },
     { key: "q7", text: "7. I am familiar with AI tools such as ChatGPT, Gemini, Copilot and other AI tools." },
@@ -287,32 +279,25 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
     { key: "q21", text: "21. Colleges should provide AI training and develop clear guidelines for the responsible and ethical use of AI in education." },
   ];
 
-  const renderLikertGroup = (questions: { key: string; text: string }[]) => (
-    <div className="space-y-6">
+  const renderLikertGroupDropdown = (questions: { key: string; text: string }[]) => (
+    <div className="space-y-4">
       {questions.map((q) => (
-        <div key={q.key} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
+        <div key={q.key} className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 space-y-2.5">
           <label className="block text-xs sm:text-sm font-bold text-slate-800 leading-relaxed">
             {q.text} *
           </label>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-            {likertOptions.map((opt) => {
-              const isSelected = likertRatings[q.key] === opt.val;
-              return (
-                <button
-                  key={opt.val}
-                  type="button"
-                  onClick={() => handleLikertChange(q.key, opt.val)}
-                  className={`p-2.5 rounded-xl text-xs font-bold border transition flex flex-col items-center justify-center gap-1 ${
-                    isSelected
-                      ? "bg-blue-600 text-white border-blue-600 shadow-md scale-[1.02]"
-                      : "bg-white border-slate-200 text-slate-700 hover:bg-slate-100"
-                  }`}
-                >
-                  <span>{opt.label}</span>
-                </button>
-              );
-            })}
-          </div>
+          <select
+            value={likertRatings[q.key] || ""}
+            onChange={(e) => handleLikertChange(q.key, Number(e.target.value))}
+            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm cursor-pointer"
+          >
+            <option value="" disabled>-- Select Your Rating --</option>
+            <option value={5}>5 - Strongly Agree</option>
+            <option value={4}>4 - Agree</option>
+            <option value={3}>3 - Neutral</option>
+            <option value={2}>2 - Disagree</option>
+            <option value={1}>1 - Strongly Disagree</option>
+          </select>
         </div>
       ))}
     </div>
@@ -333,7 +318,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                 AI Impact Questionnaire for Teaching Staff (21 Questions)
               </h2>
               <p className="text-xs text-slate-300">
-                Step {currentStep} of 5 • Confidential & Academic Study
+                Step {currentStep} of 5 • Confidential Academic Survey
               </p>
             </div>
           </div>
@@ -414,7 +399,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                       <GraduationCap className="w-5 h-5 text-blue-600" />
                       <span>SECTION A – STAFF PROFILE</span>
                     </h3>
-                    <p className="text-xs text-slate-500">Please provide your background teaching profile details.</p>
+                    <p className="text-xs text-slate-500">Select your profile details from the dropdown options below.</p>
                   </div>
 
                   {/* Q1: Age Group */}
@@ -422,22 +407,17 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                     <label className="block text-xs sm:text-sm font-bold text-slate-800">
                       1. What is your age group? *
                     </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                      {["Below 30", "31–40", "41–50", "Above 50"].map((opt) => (
-                        <button
-                          key={opt}
-                          type="button"
-                          onClick={() => setQ1AgeGroup(opt)}
-                          className={`p-3 rounded-xl text-xs font-bold border text-center transition ${
-                            q1AgeGroup === opt
-                              ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                              : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
-                          }`}
-                        >
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
+                    <select
+                      value={q1AgeGroup}
+                      onChange={(e) => setQ1AgeGroup(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm cursor-pointer"
+                    >
+                      <option value="" disabled>-- Select Age Group --</option>
+                      <option value="Below 30">Below 30</option>
+                      <option value="31–40">31–40</option>
+                      <option value="41–50">41–50</option>
+                      <option value="Above 50">Above 50</option>
+                    </select>
                   </div>
 
                   {/* Q2: Teaching Experience */}
@@ -445,22 +425,18 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                     <label className="block text-xs sm:text-sm font-bold text-slate-800">
                       2. What is your teaching experience? *
                     </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                      {["Below 5 Years", "5–10 Years", "11–15 Years", "16–20 Years", "Above 20 Years"].map((opt) => (
-                        <button
-                          key={opt}
-                          type="button"
-                          onClick={() => setQ2Experience(opt)}
-                          className={`p-2.5 rounded-xl text-xs font-bold border text-center transition ${
-                            q2Experience === opt
-                              ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                              : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
-                          }`}
-                        >
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
+                    <select
+                      value={q2Experience}
+                      onChange={(e) => setQ2Experience(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm cursor-pointer"
+                    >
+                      <option value="" disabled>-- Select Teaching Experience --</option>
+                      <option value="Below 5 Years">Below 5 Years</option>
+                      <option value="5–10 Years">5–10 Years</option>
+                      <option value="11–15 Years">11–15 Years</option>
+                      <option value="16–20 Years">16–20 Years</option>
+                      <option value="Above 20 Years">Above 20 Years</option>
+                    </select>
                   </div>
 
                   {/* Q3: Highest Educational Qualification */}
@@ -468,22 +444,17 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                     <label className="block text-xs sm:text-sm font-bold text-slate-800">
                       3. What is your highest educational qualification? *
                     </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                      {["Master’s Degree", "M.Phil.", "Ph.D.", "Other"].map((opt) => (
-                        <button
-                          key={opt}
-                          type="button"
-                          onClick={() => setQ3Qualification(opt)}
-                          className={`p-3 rounded-xl text-xs font-bold border text-center transition ${
-                            q3Qualification === opt
-                              ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                              : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
-                          }`}
-                        >
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
+                    <select
+                      value={q3Qualification}
+                      onChange={(e) => setQ3Qualification(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm cursor-pointer"
+                    >
+                      <option value="" disabled>-- Select Educational Qualification --</option>
+                      <option value="Master’s Degree">Master’s Degree</option>
+                      <option value="M.Phil.">M.Phil.</option>
+                      <option value="Ph.D.">Ph.D.</option>
+                      <option value="Other">Other</option>
+                    </select>
                   </div>
 
                   {/* Q4: AI Workshop / Training */}
@@ -491,22 +462,15 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                     <label className="block text-xs sm:text-sm font-bold text-slate-800">
                       4. Have you attended any AI-related workshop or training? *
                     </label>
-                    <div className="flex gap-3">
-                      {["Yes", "No"].map((opt) => (
-                        <button
-                          key={opt}
-                          type="button"
-                          onClick={() => setQ4Workshop(opt)}
-                          className={`px-6 py-2.5 rounded-xl text-xs font-bold border transition ${
-                            q4Workshop === opt
-                              ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                              : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
-                          }`}
-                        >
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
+                    <select
+                      value={q4Workshop}
+                      onChange={(e) => setQ4Workshop(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm cursor-pointer"
+                    >
+                      <option value="" disabled>-- Select Option --</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
                   </div>
 
                   {/* Q5: Name of Affiliated College */}
@@ -520,8 +484,8 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                         type="text"
                         value={q5College}
                         onChange={(e) => setQ5College(e.target.value)}
-                        placeholder="e.g. Government Degree College / Arts & Commerce College"
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                        placeholder="Enter your college name (e.g. Government Degree College)"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm"
                       />
                     </div>
                   </div>
@@ -535,9 +499,9 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                     <h3 className="text-base font-extrabold text-slate-900">
                       SECTION B – AI AWARENESS & USAGE
                     </h3>
-                    <p className="text-xs text-slate-500">Rate your agreement with each awareness & usage statement (1 = Strongly Disagree, 5 = Strongly Agree).</p>
+                    <p className="text-xs text-slate-500">Select your agreement rating dropdown for each statement.</p>
                   </div>
-                  {renderLikertGroup(sectionBQuestions)}
+                  {renderLikertGroupDropdown(sectionBQuestions)}
                 </div>
               )}
 
@@ -548,9 +512,9 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                     <h3 className="text-base font-extrabold text-slate-900">
                       SECTION C – IMPACT ON TEACHING
                     </h3>
-                    <p className="text-xs text-slate-500">Rate your agreement with how AI impacts your teaching effectiveness (1 = Strongly Disagree, 5 = Strongly Agree).</p>
+                    <p className="text-xs text-slate-500">Select your agreement rating dropdown regarding teaching effectiveness.</p>
                   </div>
-                  {renderLikertGroup(sectionCQuestions)}
+                  {renderLikertGroupDropdown(sectionCQuestions)}
                 </div>
               )}
 
@@ -561,9 +525,9 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                     <h3 className="text-base font-extrabold text-slate-900">
                       SECTION D – IMPACT ON STUDENT LEARNING
                     </h3>
-                    <p className="text-xs text-slate-500">Rate your agreement with how AI affects student learning outcomes (1 = Strongly Disagree, 5 = Strongly Agree).</p>
+                    <p className="text-xs text-slate-500">Select your agreement rating dropdown regarding student learning outcomes.</p>
                   </div>
-                  {renderLikertGroup(sectionDQuestions)}
+                  {renderLikertGroupDropdown(sectionDQuestions)}
                 </div>
               )}
 
@@ -574,9 +538,9 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                     <h3 className="text-base font-extrabold text-slate-900">
                       SECTION E – BENEFITS, CHALLENGES & ETHICS
                     </h3>
-                    <p className="text-xs text-slate-500">Rate your agreement regarding productivity, challenges and ethical guidelines (1 = Strongly Disagree, 5 = Strongly Agree).</p>
+                    <p className="text-xs text-slate-500">Select your agreement rating dropdown regarding productivity and ethics.</p>
                   </div>
-                  {renderLikertGroup(sectionEQuestions)}
+                  {renderLikertGroupDropdown(sectionEQuestions)}
                 </div>
               )}
 
