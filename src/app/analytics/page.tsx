@@ -90,45 +90,51 @@ function AnalyticsContent() {
       {/* 2. Main Page Content */}
       <main className="flex-1 w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 py-8 space-y-8 animate-fade-in">
         
-        {/* Page Hero Banner */}
-        <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-3xl p-6 sm:p-10 text-white shadow-xl relative overflow-hidden">
-          <div className="absolute -right-10 -top-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+        {/* Page Header Section - Natural Academic Design */}
+        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/90 shadow-sm flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           
-          <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div className="space-y-3 max-w-3xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-blue-500/20 text-blue-300 border border-blue-400/30">
-                <BarChart3 className="w-3.5 h-3.5 text-blue-400" />
-                <span>Real-Time MongoDB Analytical Dashboard</span>
-              </div>
+          <div className="space-y-2.5 max-w-3xl">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/70">
+                <BarChart3 className="w-3.5 h-3.5 text-blue-600" />
+                <span>Empirical Research Dashboard</span>
+              </span>
 
-              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
-                Research Analytics & Insights
-              </h1>
-
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                Comprehensive empirical analysis examining the adoption, learning impact, and ethical challenges of Artificial Intelligence tools across higher education degree programs.
-              </p>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Live MongoDB Sync</span>
+              </span>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 shrink-0">
-              <button
-                onClick={fetchStats}
-                className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-xs flex items-center gap-2 border border-white/20 transition backdrop-blur-sm"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${loadingStats ? "animate-spin" : ""}`} />
-                <span>Refresh Data</span>
-              </button>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+              Research Analytics & Insights
+            </h1>
 
-              <button
-                onClick={handleOpenSurvey}
-                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-blue-600/30 transition"
-              >
-                <FileText className="w-4 h-4" />
-                <span>Take Survey</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+              Empirical data analysis examining the adoption, learning impact, and ethical challenges of Artificial Intelligence tools across higher education degree programs.
+            </p>
           </div>
+
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <button
+              onClick={fetchStats}
+              className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs flex items-center gap-2 border border-slate-200 transition"
+              title="Reload live database statistics"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-slate-600 ${loadingStats ? "animate-spin" : ""}`} />
+              <span>Refresh Data</span>
+            </button>
+
+            <button
+              onClick={handleOpenSurvey}
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-sm transition"
+            >
+              <FileText className="w-4 h-4" />
+              <span>Take Survey</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
         </div>
 
         {/* 3. 5 KPI Metric Cards */}
