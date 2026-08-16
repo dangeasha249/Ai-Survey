@@ -202,35 +202,29 @@ export const AdminPanel: React.FC = () => {
   const nonAiCount = totalCount - aiUsersCount;
   const aiPercentage = totalCount ? ((aiUsersCount / totalCount) * 100).toFixed(1) : "0";
 
-  // 1. Strict Access Restriction for Student Accounts
+  // 1. If user is a Student account, display 404 Page Not Found (Page Unavailable)
   if (isStudent) {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center p-4">
-        <div className="w-full max-w-sm bg-white rounded-2xl p-7 border border-red-200 shadow-sm space-y-5 text-center animate-fade-in">
-          <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mx-auto border border-red-100">
-            <Lock className="w-6 h-6" />
-          </div>
+      <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center space-y-6 animate-fade-in">
+        <div className="space-y-3 max-w-md">
+          <h1 className="text-7xl sm:text-8xl font-black text-slate-200 tracking-tight">
+            404
+          </h1>
+          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900">
+            Page Not Found / Page Unavailable
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
+            The requested page <code className="bg-slate-100 px-1.5 py-0.5 rounded text-slate-700 font-mono text-xs">/admin</code> could not be found or is not available on this server.
+          </p>
+        </div>
 
-          <div className="space-y-1.5">
-            <h2 className="text-xl font-extrabold text-slate-900">
-              Access Restricted
-            </h2>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Your account (<strong className="text-slate-900">{user?.name}</strong> • Student Role) does not have administrative permissions.
-            </p>
-            <p className="text-[11px] text-slate-400">
-              The Admin Panel is exclusively reserved for academic Researchers. Student accounts cannot view participant datasets or admin controls.
-            </p>
-          </div>
-
-          <div className="pt-2">
-            <a
-              href="/"
-              className="block w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition shadow-sm"
-            >
-              Back to Home Page
-            </a>
-          </div>
+        <div className="pt-2">
+          <a
+            href="/"
+            className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition shadow-sm inline-flex items-center gap-2"
+          >
+            <span>Return to Home Page</span>
+          </a>
         </div>
       </div>
     );
