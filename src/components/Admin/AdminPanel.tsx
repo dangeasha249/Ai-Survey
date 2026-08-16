@@ -17,6 +17,7 @@ import {
   Sparkles,
   SlidersHorizontal,
   Building2,
+  Loader2,
 } from "lucide-react";
 import { AnalyticsCharts } from "@/components/Dashboard/AnalyticsCharts";
 import { useAuth } from "@/context/AuthContext";
@@ -52,7 +53,7 @@ interface UserItem {
 }
 
 export const AdminPanel: React.FC = () => {
-  const { user, isAuthenticated: isUserLoggedIn } = useAuth();
+  const { user, isAuthenticated: isUserLoggedIn, loadingSession } = useAuth();
   const [pinGranted, setPinGranted] = useState(false);
   const [pinInput, setPinInput] = useState("");
   const [pinError, setPinError] = useState(false);
@@ -201,6 +202,16 @@ export const AdminPanel: React.FC = () => {
   const aiUsersCount = responses.filter(r => r.usesAI === "Yes").length;
   const nonAiCount = totalCount - aiUsersCount;
   const aiPercentage = totalCount ? ((aiUsersCount / totalCount) * 100).toFixed(1) : "0";
+
+  // 0. Neutral loading spinner while fetching auth session (prevents passcode screen flicker)
+  if (loadingSession) {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center space-y-3">
+        <Loader2 className="w-7 h-7 animate-spin text-slate-400" />
+        <p className="text-xs font-semibold text-slate-400">Verifying session...</p>
+      </div>
+    );
+  }
 
   // 1. If user is a Student account, display 404 Page Not Found (Page Unavailable)
   if (isStudent) {
