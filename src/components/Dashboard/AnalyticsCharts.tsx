@@ -40,12 +40,13 @@ export const AnalyticsCharts: React.FC = () => {
   ]);
 
   useEffect(() => {
+    let isMounted = true;
     async function loadServerCharts() {
       try {
-        const res = await fetch("/api/analytics/charts");
+        const res = await fetch("/api/analytics/charts", { cache: "no-store" });
         if (res.ok) {
           const json = await res.json();
-          if (json.data) {
+          if (isMounted && json.data) {
             if (json.data.courseDistribution && json.data.courseDistribution.length > 0) {
               const colors = ["#2563EB", "#06B6D4", "#F59E0B", "#8B5CF6", "#EC4899", "#94A3B8"];
               setCourseData(
@@ -72,10 +73,11 @@ export const AnalyticsCharts: React.FC = () => {
       }
     }
     loadServerCharts();
+    return () => {
+      isMounted = false;
+    };
   }, [totalResponses]);
 
-  // Calculate SVG Pie/Donut Chart slices
-  let accumulatedPercent = 0;
   const radius = 65;
   const circumference = 2 * Math.PI * radius;
 
@@ -93,30 +95,33 @@ export const AnalyticsCharts: React.FC = () => {
           {/* Donut Visual */}
           <div className="relative flex justify-center items-center">
             <svg className="w-28 h-28 -rotate-90 transform" viewBox="0 0 160 160">
-              {courseData.map((item) => {
-                const strokeDasharray = `${(item.percentage / 100) * circumference} ${circumference}`;
-                const strokeDashoffset = -((accumulatedPercent / 100) * circumference);
-                accumulatedPercent += item.percentage;
-                
-                const isHovered = hoveredCourse === item.name;
+              {(() => {
+                let accumulatedPercent = 0;
+                return courseData.map((item) => {
+                  const strokeDasharray = `${(item.percentage / 100) * circumference} ${circumference}`;
+                  const strokeDashoffset = -((accumulatedPercent / 100) * circumference);
+                  accumulatedPercent += item.percentage;
+                  
+                  const isHovered = hoveredCourse === item.name;
 
-                return (
-                  <circle
-                    key={item.name}
-                    cx="80"
-                    cy="80"
-                    r={radius}
-                    fill="transparent"
-                    stroke={item.color}
-                    strokeWidth={isHovered ? 24 : 20}
-                    strokeDasharray={strokeDasharray}
-                    strokeDashoffset={strokeDashoffset}
-                    className="transition-all duration-300 cursor-pointer"
-                    onMouseEnter={() => setHoveredCourse(item.name)}
-                    onMouseLeave={() => setHoveredCourse(null)}
-                  />
-                );
-              })}
+                  return (
+                    <circle
+                      key={item.name}
+                      cx="80"
+                      cy="80"
+                      r={radius}
+                      fill="transparent"
+                      stroke={item.color}
+                      strokeWidth={isHovered ? 24 : 20}
+                      strokeDasharray={strokeDasharray}
+                      strokeDashoffset={strokeDashoffset}
+                      className="transition-all duration-300 cursor-pointer"
+                      onMouseEnter={() => setHoveredCourse(item.name)}
+                      onMouseLeave={() => setHoveredCourse(null)}
+                    />
+                  );
+                });
+              })()}
             </svg>
 
             {/* Inner Center Text */}
