@@ -4,20 +4,16 @@ import React, { useState } from "react";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
-import { AdminDashboard } from "@/components/Dashboard/AdminDashboard";
 import { InfoSections } from "@/components/Sections/InfoSections";
 import { Footer } from "@/components/Footer";
 import { SurveyModal } from "@/components/Modals/SurveyModal";
-import { LoginModal } from "@/components/Modals/LoginModal";
-import { DetailsModal } from "@/components/Modals/DetailsModal";
 import { ProfileModal } from "@/components/Modals/ProfileModal";
 import { AuthModal } from "@/components/Modals/AuthModal";
-import { SurveyProvider, useSurvey } from "@/context/SurveyContext";
+import { SurveyProvider } from "@/context/SurveyContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 
 function MainContent() {
   const [activeSection, setActiveSection] = useState("home");
-  const { totalResponses, aiUsers, nonAiUsers, avgImpactScore, coursesCount } = useSurvey();
   const { loginUser, logoutUser, isAuthenticated } = useAuth();
 
   // Modals state
@@ -25,7 +21,6 @@ function MainContent() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authTab, setAuthTab] = useState<"signin" | "signup">("signup");
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [selectedMetricKey, setSelectedMetricKey] = useState<string | null>(null);
 
   const handleOpenSurvey = () => {
     if (isAuthenticated) {
@@ -65,16 +60,7 @@ function MainContent() {
           onLearnMore={() => window.location.assign("/about")}
         />
 
-        {/* 3. Researcher Dashboard Panel */}
-        <div id="dashboard-section">
-          <AdminDashboard
-            onSelectMetric={(key) => setSelectedMetricKey(key)}
-            onOpenLogin={() => {
-              setAuthTab("signin");
-              setIsAuthOpen(true);
-            }}
-          />
-        </div>
+
 
         {/* 4. Secondary Content Views (About, Instructions, FAQs, Contact) */}
         <InfoSections
@@ -114,17 +100,6 @@ function MainContent() {
           setAuthTab("signin");
           setIsAuthOpen(true);
         }}
-      />
-
-      {/* Metric Stat Details Breakdown Modal */}
-      <DetailsModal
-        metricKey={selectedMetricKey}
-        onClose={() => setSelectedMetricKey(null)}
-        totalResponses={totalResponses}
-        aiUsers={aiUsers}
-        nonAiUsers={nonAiUsers}
-        avgImpactScore={avgImpactScore}
-        coursesCount={coursesCount}
       />
 
     </div>
