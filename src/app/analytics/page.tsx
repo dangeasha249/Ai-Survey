@@ -179,6 +179,10 @@ function AnalyticsContent() {
       <SurveyModal
         isOpen={isSurveyOpen}
         onClose={() => setIsSurveyOpen(false)}
+        onRequireLogin={() => {
+          setAuthTab("signin");
+          setIsAuthOpen(true);
+        }}
       />
 
       <AuthModal

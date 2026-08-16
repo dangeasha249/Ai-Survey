@@ -1,26 +1,36 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, CheckCircle, Send, ChevronRight, ChevronLeft, Sparkles, AlertCircle, ClipboardCheck } from "lucide-react";
+import { X, CheckCircle, Send, ChevronRight, ChevronLeft, Sparkles, AlertCircle, ClipboardCheck, Lock, Edit3, LogIn } from "lucide-react";
 import confetti from "canvas-confetti";
 import { useSurvey } from "@/context/SurveyContext";
+import { useAuth } from "@/context/AuthContext";
 
 interface SurveyModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmitSuccess?: () => void;
+  onRequireLogin?: () => void;
 }
 
 export const SurveyModal: React.FC<SurveyModalProps> = ({
   isOpen,
   onClose,
   onSubmitSuccess,
+  onRequireLogin,
 }) => {
   const { addSurveyResponse } = useSurvey();
+  const { user, isAuthenticated } = useAuth();
+
   const [currentStep, setCurrentStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [sectionError, setSectionError] = useState<string | null>(null);
+
+  // Edit response state
+  const [isEditing, setIsEditing] = useState(false);
+  const [existingResponseId, setExistingResponseId] = useState<string | null>(null);
+  const [loadingExisting, setLoadingExisting] = useState(false);
 
   // Q1 - Q4
   const [q1Course, setQ1Course] = useState("");
@@ -33,7 +43,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
   const [q6Frequency, setQ6Frequency] = useState("");
   const [q7Purposes, setQ7Purposes] = useState<string[]>([]);
 
-  // Q8 - Q15 (Likert Ratings 1..5: 5=Strongly Agree, 4=Agree, 3=Neutral, 2=Disagree, 1=Strongly Disagree)
+  // Q8 - Q15 (Likert Ratings 1..5)
   const [likertRatings, setLikertRatings] = useState<Record<string, number>>({});
 
   // Q16 - Q20
@@ -42,6 +52,54 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
   const [q18Workshop, setQ18Workshop] = useState("");
   const [q19NeedTraining, setQ19NeedTraining] = useState("");
   const [q20OverallOpinion, setQ20OverallOpinion] = useState("");
+
+  // Fetch existing survey if user is logged in
+  useEffect(() => {
+    let isMounted = true;
+
+    async function checkUserSurvey() {
+      if (isOpen && isAuthenticated && user?.email) {
+        setLoadingExisting(true);
+        try {
+          const res = await fetch(`/api/survey?email=${encodeURIComponent(user.email)}`);
+          if (res.ok) {
+            const json = await res.json();
+            if (isMounted && json.hasSubmitted && json.existingResponse) {
+              const r = json.existingResponse;
+              const ans = r.surveyAnswers || {};
+
+              setIsEditing(true);
+              setExistingResponseId(r.responseId);
+
+              setQ1Course(ans.q1Course || r.course || "");
+              setQ2Year(ans.q2Year || "");
+              setQ3Aware(ans.q3Aware || "Yes");
+              setQ4UsedAI(ans.q4UsedAI || r.usesAI || "Yes");
+              setQ5Tools(ans.q5Tools || (r.primaryTool ? [r.primaryTool] : []));
+              setQ6Frequency(ans.q6Frequency || "Daily");
+              setQ7Purposes(ans.q7Purposes || []);
+              setLikertRatings(ans.likertRatings || {});
+              setQ16Challenges(ans.q16Challenges || []);
+              setQ17Verify(ans.q17Verify || "");
+              setQ18Workshop(ans.q18Workshop || "");
+              setQ19NeedTraining(ans.q19NeedTraining || "");
+              setQ20OverallOpinion(ans.q20OverallOpinion || "");
+            }
+          }
+        } catch {
+          // Ignore
+        } finally {
+          if (isMounted) setLoadingExisting(false);
+        }
+      }
+    }
+
+    checkUserSurvey();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isOpen, isAuthenticated, user?.email]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -125,6 +183,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
       : 4;
 
     const payload = {
+      userEmail: user?.email,
       course: q1Course,
       usesAI: q4UsedAI,
       primaryTool: q5Tools[0] || "ChatGPT",
@@ -164,6 +223,49 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
     setCurrentStep(1);
     onClose();
   };
+
+  // 1. Enforce Authentication Check
+  if (!isAuthenticated) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in">
+        <div className="bg-white rounded-3xl p-7 max-w-sm w-full shadow-2xl border border-slate-100 text-center space-y-5 relative">
+          <button
+            onClick={onClose}
+            className="absolute right-4 top-4 p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100 transition"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
+          <div className="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto border border-amber-100 shadow-sm">
+            <Lock className="w-7 h-7" />
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="text-xl font-extrabold text-slate-900">
+              Sign In Required
+            </h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Please sign in or create an account to participate in the AI Impact Survey.
+            </p>
+            <p className="text-[11px] text-slate-400">
+              Each account can submit the survey once and update their saved response anytime.
+            </p>
+          </div>
+
+          <button
+            onClick={() => {
+              onClose();
+              if (onRequireLogin) onRequireLogin();
+            }}
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition"
+          >
+            <LogIn className="w-4 h-4" />
+            <span>Sign In / Create Account</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const likertOptions = [
     { label: "Strongly Agree", val: 5 },
@@ -206,12 +308,25 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
-            title="Close Modal"
+            className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition"
+            aria-label="Close modal"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {/* Edit Banner if editing existing response */}
+        {isEditing && (
+          <div className="bg-emerald-50 border-b border-emerald-100 px-5 sm:px-8 py-2 flex items-center justify-between text-xs font-bold text-emerald-800">
+            <div className="flex items-center gap-2">
+              <Edit3 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span>Editing Previously Saved Survey Response ({existingResponseId})</span>
+            </div>
+            <span className="hidden sm:inline-block text-[10px] bg-emerald-200/60 text-emerald-900 px-2.5 py-0.5 rounded-full">
+              Single Account Sync
+            </span>
+          </div>
+        )}
 
         {/* Progress Step Bar */}
         <div className="bg-slate-100 px-4 sm:px-8 py-3 border-b border-slate-200 shrink-0">
@@ -673,7 +788,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                     className="px-7 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-lg flex items-center gap-2 transition"
                   >
                     <Send className="w-4 h-4" />
-                    <span>Submit 20-Question Survey</span>
+                    <span>{isEditing ? "Update My Saved Survey Answers" : "Submit 20-Question Survey"}</span>
                   </button>
                 )}
               </div>
@@ -686,10 +801,12 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                 <CheckCircle className="w-10 h-10" />
               </div>
               <h3 className="text-2xl font-extrabold text-slate-900">
-                Survey Submitted Successfully!
+                {isEditing ? "Survey Updated Successfully!" : "Survey Submitted Successfully!"}
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Thank you for completing all 20 questions of the <strong>AI-Edu Impact Survey</strong>. Your responses have been recorded in the database.
+                {isEditing
+                  ? "Your previous survey response has been updated successfully in the MongoDB database."
+                  : "Thank you for completing all 20 questions of the AI-Edu Impact Survey. Your response has been recorded."}
               </p>
               <button
                 onClick={handleReset}

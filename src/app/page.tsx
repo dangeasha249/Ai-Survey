@@ -75,6 +75,10 @@ function MainContent() {
       <SurveyModal
         isOpen={isSurveyOpen}
         onClose={() => setIsSurveyOpen(false)}
+        onRequireLogin={() => {
+          setAuthTab("signin");
+          setIsAuthOpen(true);
+        }}
       />
 
       {/* MongoDB Authentication Modal (Sign In & Sign Up) */}

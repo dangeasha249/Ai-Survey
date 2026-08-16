@@ -2,10 +2,12 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface ISurveyResponse extends Document {
   responseId: string;
+  userEmail?: string;
   course: string;
   usesAI: string;
   primaryTool: string;
   impactRating: number;
+  surveyAnswers?: any;
   
   // Detailed Section Answers
   studentProfile?: {
@@ -52,6 +54,7 @@ export interface ISurveyResponse extends Document {
 const SurveyResponseSchema: Schema = new Schema(
   {
     responseId: { type: String, required: true, unique: true },
+    userEmail: { type: String, index: true },
     course: { type: String, required: true },
     usesAI: { type: String, required: true, default: "Yes" },
     primaryTool: { type: String, required: true, default: "ChatGPT" },
