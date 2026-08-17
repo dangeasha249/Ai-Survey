@@ -116,9 +116,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           {/* Right Column Floating Interactive Survey Form Card */}
           <div className="lg:col-span-6 flex justify-center items-center relative">
 
-            {/* Background Ambient Glow */}
-            <div className="absolute -inset-4 bg-gradient-to-tr from-blue-500/20 to-sky-400/20 rounded-[40px] blur-2xl -z-10 pointer-events-none" />
-
             {/* Floating Survey Form Card */}
             <div className="w-full max-w-lg bg-white rounded-3xl p-6 sm:p-7 shadow-2xl border border-blue-100/90 relative overflow-hidden animate-fade-in space-y-4">
 
