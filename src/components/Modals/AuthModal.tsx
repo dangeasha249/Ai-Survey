@@ -265,6 +265,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <span>{loading ? "Authenticating..." : "Sign In to Account"}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
+
+            <div className="text-center pt-1.5 text-xs font-semibold text-slate-500">
+              Don&apos;t have an account?{" "}
+              <button
+                type="button"
+                onClick={() => { setTab("signup"); setErrorMessage(null); }}
+                className="text-blue-600 font-bold hover:underline cursor-pointer"
+              >
+                Create Account / Sign Up
+              </button>
+            </div>
           </form>
         )}
 
@@ -321,6 +332,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <span>{loading ? "Creating Account..." : "Create Account & Sign In"}</span>
               <CheckCircle2 className="w-4 h-4" />
             </button>
+
+            <div className="text-center pt-1.5 text-xs font-semibold text-slate-500">
+              Already have an account?{" "}
+              <button
+                type="button"
+                onClick={() => { setTab("signin"); setErrorMessage(null); }}
+                className="text-blue-600 font-bold hover:underline cursor-pointer"
+              >
+                Sign In
+              </button>
+            </div>
           </form>
         )}
 
