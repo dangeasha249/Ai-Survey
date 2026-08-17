@@ -19,7 +19,7 @@ const UserSchema: Schema = new Schema(
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     password: { type: String, required: true },
-    role: { type: String, enum: ["Researcher", "Student"], default: "Researcher" },
+    role: { type: String, enum: ["Researcher", "Student"], default: "Student" },
     institution: { type: String, default: "University of Mumbai / Higher Education Cell" },
     department: { type: String, default: "Department of Computer Science" },
     orcid: { type: String, default: "0000-0002-1825-009X" },

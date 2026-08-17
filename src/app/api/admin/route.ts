@@ -2,9 +2,13 @@ import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { connectToDatabase } from "@/lib/mongodb";
 import SurveyResponseModel from "@/models/SurveyResponse";
+import { requireResearcher } from "@/lib/auth";
 
 // GET all survey responses with full details for Admin Panel
 export async function GET() {
+  if (!requireResearcher()) {
+    return NextResponse.json({ success: false, message: "Researcher authorization required." }, { status: 401 });
+  }
   try {
     await connectToDatabase();
     const responses = await SurveyResponseModel.find().sort({ createdAt: -1 }).lean();
@@ -42,18 +46,21 @@ export async function GET() {
       responses: formatted,
     });
   } catch (error: any) {
-    console.error("Admin GET Error:", error);
+    console.error("Admin GET Error:", error instanceof Error ? error.message : "Unknown");
     return NextResponse.json({ success: false, message: "Failed to fetch admin data" }, { status: 500 });
   }
 }
 // DELETE a specific response by ID
 export async function DELETE(request: Request) {
+  if (!requireResearcher()) {
+    return NextResponse.json({ success: false, message: "Researcher authorization required." }, { status: 401 });
+  }
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
-    if (!id) {
-      return NextResponse.json({ success: false, message: "Response ID is required." }, { status: 400 });
+    if (!id || typeof id !== "string" || id.length > 128) {
+      return NextResponse.json({ success: false, message: "Valid Response ID is required." }, { status: 400 });
     }
 
     await connectToDatabase();
@@ -70,7 +77,7 @@ export async function DELETE(request: Request) {
       deletedCount: result.deletedCount,
     });
   } catch (error: any) {
-    console.error("Admin DELETE Error:", error);
-    return NextResponse.json({ success: false, message: error?.message || "Failed to delete response" }, { status: 500 });
+    console.error("Admin DELETE Error:", error instanceof Error ? error.message : "Unknown");
+    return NextResponse.json({ success: false, message: "Failed to delete response" }, { status: 500 });
   }
 }

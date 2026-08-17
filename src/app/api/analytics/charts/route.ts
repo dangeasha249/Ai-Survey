@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import SurveyResponseModel from "@/models/SurveyResponse";
+import { requireResearcher } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function GET() {
+  if (!requireResearcher()) {
+    return NextResponse.json({ success: false, message: "Researcher authorization required." }, { status: 401 });
+  }
   try {
     await connectToDatabase();
     const responses = await SurveyResponseModel.find().lean();
