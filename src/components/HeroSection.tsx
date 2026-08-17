@@ -51,7 +51,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           <div className="lg:col-span-6 space-y-5 sm:space-y-6 relative">
             
             {/* Ambient Watermark Background Image behind text */}
-            <div className="absolute -inset-6 -z-10 opacity-15 pointer-events-none flex items-center justify-center overflow-hidden">
+            <div className="absolute -inset-6 -z-10 opacity-50 pointer-events-none flex items-center justify-center overflow-hidden">
               <Image
                 src="/images/landing-page.png"
                 alt="AI Tools in Higher Education Illustration"
