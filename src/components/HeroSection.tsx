@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import {
   FileEdit,
   Info,
@@ -96,6 +97,18 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 <Info className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>Learn More</span>
               </button>
+            </div>
+
+            {/* Illustration Image under buttons */}
+            <div className="pt-2 sm:pt-4 flex justify-center lg:justify-start">
+              <Image
+                src="/images/landing-page.png"
+                alt="AI Tools in Higher Education Illustration"
+                width={480}
+                height={320}
+                className="w-full max-w-xs sm:max-w-md h-auto object-contain rounded-2xl"
+                priority
+              />
             </div>
 
           </div>
