@@ -15,8 +15,8 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    if (password.length < 10) {
-      return NextResponse.json({ success: false, message: "Password must be at least 10 characters." }, { status: 400 });
+    if (password.length < 6) {
+      return NextResponse.json({ success: false, message: "Password must be at least 6 characters." }, { status: 400 });
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       return NextResponse.json({ success: false, message: "Enter a valid email address." }, { status: 400 });

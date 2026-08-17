@@ -322,7 +322,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 animate-fade-in">
       <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
-        
+
         {/* Header */}
         <div className="sticky top-0 z-20 bg-slate-900 text-white px-5 sm:px-8 py-4 flex items-center justify-between shadow-md">
           <div className="flex items-center gap-3">
@@ -373,13 +373,12 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                     setCurrentStep(st.id);
                   }
                 }}
-                className={`py-1.5 px-1 rounded-xl text-[10px] sm:text-xs font-bold transition truncate ${
-                  currentStep === st.id
+                className={`py-1.5 px-1 rounded-xl text-[10px] sm:text-xs font-bold transition truncate ${currentStep === st.id
                     ? "bg-blue-600 text-white shadow-sm"
                     : st.id < currentStep
-                    ? "bg-blue-100 text-blue-800"
-                    : "bg-slate-200/60 text-slate-500 hover:bg-slate-200"
-                }`}
+                      ? "bg-blue-100 text-blue-800"
+                      : "bg-slate-200/60 text-slate-500 hover:bg-slate-200"
+                  }`}
               >
                 {st.label}
               </button>
@@ -389,7 +388,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
 
         {/* Scrollable Form Body */}
         <div className="p-5 sm:p-8 overflow-y-auto flex-1 space-y-6">
-          
+
           {sectionError && (
             <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center gap-2 animate-shake">
               <HelpCircle className="w-4 h-4 text-red-500 shrink-0" />
@@ -406,7 +405,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
 
           {!submitted ? (
             <form onSubmit={handleSubmit} className="space-y-6">
-              
+
               {/* STEP 1: SECTION A – STAFF PROFILE */}
               {currentStep === 1 && (
                 <div className="space-y-5 animate-fade-in">

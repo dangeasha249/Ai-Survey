@@ -151,7 +151,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/65 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full p-5 sm:p-8 shadow-2xl border border-slate-100 relative max-h-[94dvh] overflow-y-auto">
-        
+
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -174,22 +174,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <button
               type="button"
               onClick={() => { setTab("signin"); setErrorMessage(null); }}
-              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
-                tab === "signin"
+              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${tab === "signin"
                   ? "bg-white text-blue-600 shadow-sm"
                   : "text-slate-600 hover:text-slate-900"
-              }`}
+                }`}
             >
               Sign In
             </button>
             <button
               type="button"
               onClick={() => { setTab("signup"); setErrorMessage(null); }}
-              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
-                tab === "signup"
+              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${tab === "signup"
                   ? "bg-white text-blue-600 shadow-sm"
                   : "text-slate-600 hover:text-slate-900"
-              }`}
+                }`}
             >
               Sign Up
             </button>
@@ -229,7 +227,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <form onSubmit={handleLoginSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
-                Institutional Email
+                Email Address
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
@@ -238,7 +236,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   required
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
-                  placeholder="researcher@aiedu.org"
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-blue-600 focus:outline-none"
                 />
               </div>
@@ -255,7 +252,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   required
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
-                  placeholder="••••••••"
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-blue-600 focus:outline-none"
                 />
               </div>
@@ -284,7 +280,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   required
                   value={signupName}
                   onChange={(e) => setSignupName(e.target.value)}
-                  placeholder="e.g. Dr. Rajesh Sharma"
                   className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-blue-600"
                 />
               </div>
@@ -299,7 +294,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   required
                   value={signupEmail}
                   onChange={(e) => setSignupEmail(e.target.value)}
-                  placeholder="rajesh.sharma@college.edu"
                   className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-blue-600"
                 />
               </div>
@@ -314,7 +308,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   required
                   value={signupPassword}
                   onChange={(e) => setSignupPassword(e.target.value)}
-                  placeholder="At least 6 characters"
                   className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-blue-600"
                 />
               </div>
