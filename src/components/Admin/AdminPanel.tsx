@@ -165,8 +165,29 @@ export const AdminPanel: React.FC = () => {
     }
   };
 
-  const handleExportCSV = () => {
-    window.open("/api/admin/export", "_blank");
+  const handleExportCSV = async () => {
+    try {
+      const res = await fetch("/api/admin/export", {
+        method: "GET",
+        credentials: "include", // send session cookie
+      });
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}));
+        alert(json.message || "Export failed. Please make sure you are signed in as a Researcher.");
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Faculty_AI_Impact_Dataset_${new Date().toISOString().split("T")[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      alert("Failed to export CSV. Please try again.");
+    }
   };
 
   // Filtered responses list
