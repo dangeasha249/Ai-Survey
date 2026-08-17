@@ -194,26 +194,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </div>
         </div>
 
-        {/* Continue with Google Button */}
-        <div className="mb-4 space-y-3">
-          <button
-            type="button"
-            onClick={handleGoogleAuth}
-            disabled={loading}
-            className="w-full py-2.5 px-4 bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 rounded-xl text-xs font-bold text-slate-700 shadow-sm flex items-center justify-center gap-2.5 transition active:scale-[0.99]"
-          >
-            <GoogleIcon />
-            <span>Continue with Google</span>
-          </button>
-
-          <div className="relative flex items-center justify-center">
-            <div className="w-full border-t border-slate-200" />
-            <span className="bg-white px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 absolute">
-              or continue with email
-            </span>
-          </div>
-        </div>
-
         {/* Error Banner */}
         {errorMessage && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-semibold flex items-center gap-2">
@@ -266,7 +246,27 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <ArrowRight className="w-4 h-4" />
             </button>
 
-            <div className="text-center pt-1.5 text-xs font-semibold text-slate-500">
+            {/* Google Auth Divider & Button */}
+            <div className="pt-2 space-y-3">
+              <div className="relative flex items-center justify-center">
+                <div className="w-full border-t border-slate-200" />
+                <span className="bg-white px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 absolute">
+                  or
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleGoogleAuth}
+                disabled={loading}
+                className="w-full py-2.5 px-4 bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 rounded-xl text-xs font-bold text-slate-700 shadow-sm flex items-center justify-center gap-2.5 transition active:scale-[0.99]"
+              >
+                <GoogleIcon />
+                <span>Continue with Google</span>
+              </button>
+            </div>
+
+            <div className="text-center pt-2 text-xs font-semibold text-slate-500">
               Don&apos;t have an account?{" "}
               <button
                 type="button"
@@ -333,7 +333,27 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <CheckCircle2 className="w-4 h-4" />
             </button>
 
-            <div className="text-center pt-1.5 text-xs font-semibold text-slate-500">
+            {/* Google Auth Divider & Button */}
+            <div className="pt-2 space-y-3">
+              <div className="relative flex items-center justify-center">
+                <div className="w-full border-t border-slate-200" />
+                <span className="bg-white px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 absolute">
+                  or
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleGoogleAuth}
+                disabled={loading}
+                className="w-full py-2.5 px-4 bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 rounded-xl text-xs font-bold text-slate-700 shadow-sm flex items-center justify-center gap-2.5 transition active:scale-[0.99]"
+              >
+                <GoogleIcon />
+                <span>Continue with Google</span>
+              </button>
+            </div>
+
+            <div className="text-center pt-2 text-xs font-semibold text-slate-500">
               Already have an account?{" "}
               <button
                 type="button"
