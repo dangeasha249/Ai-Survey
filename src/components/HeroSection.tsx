@@ -47,8 +47,19 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
 
-          {/* Left Column Text Content */}
-          <div className="lg:col-span-6 space-y-5 sm:space-y-6">
+          {/* Left Column Text Content with Background Image */}
+          <div className="lg:col-span-6 space-y-5 sm:space-y-6 relative p-6 sm:p-8 rounded-3xl bg-white/60 sm:bg-white/40 backdrop-blur-sm border border-blue-100/80 shadow-sm overflow-hidden">
+            
+            {/* Background Image behind text */}
+            <div className="absolute inset-0 -z-10 opacity-20 pointer-events-none flex items-center justify-center overflow-hidden">
+              <Image
+                src="/images/landing-page.png"
+                alt="AI Tools in Higher Education Illustration"
+                fill
+                className="object-cover object-center"
+                priority
+              />
+            </div>
 
             <div className="space-y-2 sm:space-y-3">
               <h1 className="text-xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
@@ -59,22 +70,22 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               </h2>
             </div>
 
-            <p className="text-xs sm:text-lg text-slate-600 leading-relaxed max-w-2xl">
+            <p className="text-xs sm:text-lg text-slate-600 leading-relaxed max-w-2xl font-medium">
               This study aims to analyze the impact of Artificial Intelligence tools
               on teaching effectiveness and student learning outcomes in higher education.
             </p>
 
             {/* Trust Badges (Parallel Single Row Grid on Mobile View) */}
             <div className="grid grid-cols-3 gap-1 sm:flex sm:flex-wrap sm:gap-2.5 pt-1 text-[9px] min-[370px]:text-[10px] sm:text-xs font-semibold text-blue-900">
-              <div className="flex items-center justify-center gap-1 bg-blue-100/70 px-1 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-blue-200/80 text-center whitespace-nowrap">
+              <div className="flex items-center justify-center gap-1 bg-blue-100/80 px-1 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-blue-200 text-center whitespace-nowrap">
                 <CheckCircle2 className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-blue-600 shrink-0" />
                 <span>100% Confidential</span>
               </div>
-              <div className="flex items-center justify-center gap-1 bg-blue-100/70 px-1 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-blue-200/80 text-center whitespace-nowrap">
+              <div className="flex items-center justify-center gap-1 bg-blue-100/80 px-1 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-blue-200 text-center whitespace-nowrap">
                 <Lock className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-blue-600 shrink-0" />
                 <span>Secure Data</span>
               </div>
-              <div className="flex items-center justify-center gap-1 bg-blue-100/70 px-1 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-blue-200/80 text-center whitespace-nowrap">
+              <div className="flex items-center justify-center gap-1 bg-blue-100/80 px-1 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-blue-200 text-center whitespace-nowrap">
                 <UserCheck className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-blue-600 shrink-0" />
                 <span className="truncate">Academic Only</span>
               </div>
@@ -92,23 +103,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
               <button
                 onClick={onLearnMore}
-                className="flex-1 sm:flex-none justify-center px-4 sm:px-7 py-2.5 sm:py-3.5 text-xs sm:text-base font-semibold text-blue-600 border border-blue-600 sm:border-2 rounded-xl hover:bg-blue-50 transition-all duration-200 active:scale-95 flex items-center gap-1.5 sm:gap-2.5 whitespace-nowrap"
+                className="flex-1 sm:flex-none justify-center px-4 sm:px-7 py-2.5 sm:py-3.5 text-xs sm:text-base font-semibold text-blue-600 border border-blue-600 sm:border-2 bg-white/80 hover:bg-blue-50 transition-all duration-200 active:scale-95 flex items-center gap-1.5 sm:gap-2.5 whitespace-nowrap"
               >
                 <Info className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>Learn More</span>
               </button>
-            </div>
-
-            {/* Illustration Image under buttons */}
-            <div className="pt-2 sm:pt-4 flex justify-center lg:justify-start">
-              <Image
-                src="/images/landing-page.png"
-                alt="AI Tools in Higher Education Illustration"
-                width={480}
-                height={320}
-                className="w-full max-w-xs sm:max-w-md h-auto object-contain rounded-2xl"
-                priority
-              />
             </div>
 
           </div>
