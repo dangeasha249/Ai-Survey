@@ -54,13 +54,9 @@ interface UserItem {
 
 export const AdminPanel: React.FC = () => {
   const { user, isAuthenticated: isUserLoggedIn, loadingSession } = useAuth();
-  const [pinGranted, setPinGranted] = useState(false);
-  const [pinInput, setPinInput] = useState("");
-  const [pinError, setPinError] = useState(false);
 
-  const isStudent = isUserLoggedIn && user?.role === "Student";
+  // Only Researcher role can access admin panel — no PIN required
   const isResearcher = isUserLoggedIn && user?.role === "Researcher";
-  const isAccessGranted = isResearcher || (pinGranted && !isStudent);
 
   const [activeTab, setActiveTab] = useState<"responses" | "users" | "analytics">("responses");
   const [responses, setResponses] = useState<ResponseItem[]>([]);
@@ -77,24 +73,11 @@ export const AdminPanel: React.FC = () => {
   const [actionMessage, setActionMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isAccessGranted) {
+    if (isResearcher) {
       fetchResponses();
       fetchUsers();
     }
-  }, [isAccessGranted]);
-
-  // Admin PIN Passcode check
-  const handlePinSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (pinInput === "1234" || pinInput === "admin123" || pinInput.toLowerCase() === "admin") {
-      setPinGranted(true);
-      setPinError(false);
-      fetchResponses();
-      fetchUsers();
-    } else {
-      setPinError(true);
-    }
-  };
+  }, [isResearcher]);
 
   const fetchResponses = async () => {
     setLoading(true);
@@ -203,91 +186,38 @@ export const AdminPanel: React.FC = () => {
   const nonAiCount = totalCount - aiUsersCount;
   const aiPercentage = totalCount ? ((aiUsersCount / totalCount) * 100).toFixed(1) : "0";
 
-  // 0. Neutral loading spinner while fetching auth session (prevents passcode screen flicker)
+  // 0. Loading spinner while session is being verified
   if (loadingSession) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center space-y-3">
         <Loader2 className="w-7 h-7 animate-spin text-slate-400" />
-        <p className="text-xs font-semibold text-slate-400">Verifying session...</p>
+        <p className="text-xs font-semibold text-slate-400">Verifying access...</p>
       </div>
     );
   }
 
-  // 1. If user is a Student account, display 404 Page Not Found (Page Unavailable)
-  if (isStudent) {
+  // 1. Non-Researcher users (Teachers not logged in, or Student role) — Access Denied
+  if (!isResearcher) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center space-y-6 animate-fade-in">
+        <div className="w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center mx-auto border border-red-100">
+          <Lock className="w-7 h-7 text-red-500" />
+        </div>
         <div className="space-y-3 max-w-md">
-          <h1 className="text-7xl sm:text-8xl font-black text-slate-200 tracking-tight">
-            404
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+            Access Restricted
           </h1>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900">
-            Page Not Found / Page Unavailable
-          </h2>
           <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
-            The requested page <code className="bg-slate-100 px-1.5 py-0.5 rounded text-slate-700 font-mono text-xs">/admin</code> could not be found or is not available on this server.
+            This page is only accessible to <strong className="text-slate-700">authorized researchers</strong>.
+            Please sign in with a Researcher account to continue.
           </p>
         </div>
-
-        <div className="pt-2">
-          <a
-            href="/"
-            className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition shadow-sm inline-flex items-center gap-2"
-          >
-            <span>Return to Home Page</span>
-          </a>
-        </div>
-      </div>
-    );
-  }
-
-  // 2. Lock Screen for unauthenticated guests
-  if (!isAccessGranted) {
-    return (
-      <div className="min-h-[70vh] flex items-center justify-center p-4">
-        <div className="w-full max-w-sm bg-white rounded-2xl p-7 border border-slate-200 shadow-sm space-y-5 text-center animate-fade-in">
-          <div className="w-12 h-12 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center mx-auto">
-            <Lock className="w-6 h-6" />
-          </div>
-
-          <div className="space-y-1">
-            <h2 className="text-xl font-bold text-slate-900">
-              Admin Access
-            </h2>
-            <p className="text-xs text-slate-500">
-              Enter your passcode to manage survey responses and export datasets.
-            </p>
-          </div>
-
-          <form onSubmit={handlePinSubmit} className="space-y-3">
-            <div className="text-left">
-              <input
-                type="password"
-                value={pinInput}
-                onChange={(e) => setPinInput(e.target.value)}
-                placeholder="Passcode (e.g. 1234)"
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400"
-              />
-            </div>
-
-            {pinError && (
-              <p className="text-xs font-semibold text-red-600 bg-red-50 p-2 rounded-lg border border-red-100">
-                Incorrect passcode. (Try <strong>1234</strong>)
-              </p>
-            )}
-
-            <button
-              type="submit"
-              className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition shadow-sm"
-            >
-              Enter Admin Portal
-            </button>
-          </form>
-
-          <p className="text-[11px] text-slate-400">
-            Passcode: <code>1234</code>
-          </p>
-        </div>
+        <a
+          href="/"
+          className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition shadow-sm inline-flex items-center gap-2"
+        >
+          <span>Return to Home Page</span>
+        </a>
       </div>
     );
   }
@@ -334,13 +264,14 @@ export const AdminPanel: React.FC = () => {
             <span>Export CSV</span>
           </button>
 
-          <button
-            onClick={() => setPinGranted(false)}
+          <a
+            href="/api/auth/session"
+            onClick={async (e) => { e.preventDefault(); await fetch("/api/auth/session", { method: "DELETE" }); window.location.href = "/"; }}
             className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition"
-            title="Lock Panel"
+            title="Sign Out"
           >
             <LogOut className="w-4 h-4" />
-          </button>
+          </a>
         </div>
 
       </div>
