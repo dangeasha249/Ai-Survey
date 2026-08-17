@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, CheckCircle, Send, ChevronRight, ChevronLeft, Lock, Edit3, LogIn, GraduationCap, Building2, HelpCircle, Check, Sparkles } from "lucide-react";
+import { X, CheckCircle, Send, ChevronRight, ChevronLeft, Lock, Edit3, LogIn, GraduationCap, Building2, HelpCircle } from "lucide-react";
 import confetti from "canvas-confetti";
 import { useSurvey } from "@/context/SurveyContext";
 import { useAuth } from "@/context/AuthContext";
@@ -42,36 +42,52 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
   // SECTIONS B, C, D, E – LIKERT RATINGS 1..5 (Q6 - Q21)
   const [likertRatings, setLikertRatings] = useState<Record<string, number>>({});
 
-  // Fetch existing survey if user is logged in
+  // Fetch existing survey if user is logged in & reset state on open
   useEffect(() => {
     let isMounted = true;
 
     async function checkUserSurvey() {
-      if (isOpen && isAuthenticated && user?.email) {
-        setLoadingExisting(true);
-        try {
-          const res = await fetch(`/api/survey?email=${encodeURIComponent(user.email)}`);
-          if (res.ok) {
-            const json = await res.json();
-            if (isMounted && json.hasSubmitted && json.existingResponse) {
-              const r = json.existingResponse;
-              const ans = r.surveyAnswers || {};
+      if (isOpen) {
+        // Reset all form state to clean empty defaults on modal open
+        setIsEditing(false);
+        setExistingResponseId(null);
+        setSubmitted(false);
+        setCurrentStep(1);
+        setSectionError(null);
+        setSubmitError(null);
+        setQ1AgeGroup("");
+        setQ2Experience("");
+        setQ3Qualification("");
+        setQ4Workshop("");
+        setQ5College("");
+        setLikertRatings({});
 
-              setIsEditing(true);
-              setExistingResponseId(r.responseId);
+        if (isAuthenticated && user?.email) {
+          setLoadingExisting(true);
+          try {
+            const res = await fetch(`/api/survey?email=${encodeURIComponent(user.email)}`);
+            if (res.ok) {
+              const json = await res.json();
+              if (isMounted && json.hasSubmitted && json.existingResponse) {
+                const r = json.existingResponse;
+                const ans = r.surveyAnswers || {};
 
-              setQ1AgeGroup(ans.q1AgeGroup || ans.staffProfile?.ageGroup || "");
-              setQ2Experience(ans.q2Experience || ans.staffProfile?.experience || "");
-              setQ3Qualification(ans.q3Qualification || ans.staffProfile?.qualification || "");
-              setQ4Workshop(ans.q4Workshop || ans.staffProfile?.workshop || "");
-              setQ5College(ans.q5College || r.course || "");
-              setLikertRatings(ans.likertRatings || {});
+                setIsEditing(true);
+                setExistingResponseId(r.responseId);
+
+                setQ1AgeGroup(ans.q1AgeGroup || ans.staffProfile?.ageGroup || "");
+                setQ2Experience(ans.q2Experience || ans.staffProfile?.experience || "");
+                setQ3Qualification(ans.q3Qualification || ans.staffProfile?.qualification || "");
+                setQ4Workshop(ans.q4Workshop || ans.staffProfile?.workshop || "");
+                setQ5College(ans.q5College || r.course || "");
+                setLikertRatings(ans.likertRatings || {});
+              }
             }
+          } catch {
+            // Ignore
+          } finally {
+            if (isMounted) setLoadingExisting(false);
           }
-        } catch {
-          // Ignore
-        } finally {
-          if (isMounted) setLoadingExisting(false);
         }
       }
     }
@@ -96,11 +112,11 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
   if (!isOpen) return null;
 
   const stepsList = [
-    { id: 1, name: "Profile", label: "A. Staff Profile" },
-    { id: 2, name: "Awareness", label: "B. AI Awareness" },
-    { id: 3, name: "Teaching", label: "C. Teaching Impact" },
-    { id: 4, name: "Learning", label: "D. Student Learning" },
-    { id: 5, name: "Ethics", label: "E. Ethics & Benefits" },
+    { id: 1, label: "A. Staff Profile" },
+    { id: 2, label: "B. AI Awareness & Usage" },
+    { id: 3, label: "C. Impact on Teaching" },
+    { id: 4, label: "D. Student Learning" },
+    { id: 5, label: "E. Benefits & Ethics" },
   ];
 
   const handleLikertChange = (key: string, val: number) => {
@@ -211,7 +227,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
   // 1. Enforce Authentication Check
   if (!isAuthenticated) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fade-in">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in">
         <div className="bg-white rounded-3xl p-7 max-w-sm w-full shadow-2xl border border-slate-100 text-center space-y-5 relative">
           <button
             onClick={onClose}
@@ -241,7 +257,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
               onClose();
               if (onRequireLogin) onRequireLogin();
             }}
-            className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition"
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition"
           >
             <LogIn className="w-4 h-4" />
             <span>Sign In / Create Account</span>
@@ -282,52 +298,50 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
   const renderLikertGroupDropdown = (questions: { key: string; text: string }[]) => (
     <div className="space-y-4">
       {questions.map((q) => (
-        <div key={q.key} className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm space-y-3 hover:border-blue-300 transition duration-150">
-          <label className="block text-xs sm:text-sm font-bold text-slate-900 leading-relaxed">
-            {q.text} <span className="text-blue-600">*</span>
+        <div key={q.key} className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 space-y-2.5">
+          <label className="block text-xs sm:text-sm font-bold text-slate-800 leading-relaxed">
+            {q.text} *
           </label>
-          <div className="relative">
-            <select
-              value={likertRatings[q.key] || ""}
-              onChange={(e) => handleLikertChange(q.key, Number(e.target.value))}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/70 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition cursor-pointer shadow-inner"
-            >
-              <option value="" disabled>-- Select Rating Dropdown --</option>
-              <option value={5}>5 - Strongly Agree</option>
-              <option value={4}>4 - Agree</option>
-              <option value={3}>3 - Neutral</option>
-              <option value={2}>2 - Disagree</option>
-              <option value={1}>1 - Strongly Disagree</option>
-            </select>
-          </div>
+          <select
+            value={likertRatings[q.key] || ""}
+            onChange={(e) => handleLikertChange(q.key, Number(e.target.value))}
+            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm cursor-pointer"
+          >
+            <option value="" disabled>-- Select Your Rating --</option>
+            <option value={5}>5 - Strongly Agree</option>
+            <option value={4}>4 - Agree</option>
+            <option value={3}>3 - Neutral</option>
+            <option value={2}>2 - Disagree</option>
+            <option value={1}>1 - Strongly Disagree</option>
+          </select>
         </div>
       ))}
     </div>
   );
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fade-in">
-      <div className="relative w-full max-w-4xl bg-slate-50 rounded-3xl shadow-2xl border border-slate-200/90 overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 animate-fade-in">
+      <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
         
-        {/* Modern Light Academic Header */}
-        <div className="sticky top-0 z-20 bg-white border-b border-slate-200/80 px-6 sm:px-8 py-4 flex items-center justify-between shadow-sm">
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shrink-0 shadow-sm">
-              <GraduationCap className="w-6 h-6" />
+        {/* Header */}
+        <div className="sticky top-0 z-20 bg-slate-900 text-white px-5 sm:px-8 py-4 flex items-center justify-between shadow-md">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0 shadow-sm">
+              <GraduationCap className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">
-                Faculty AI Impact Questionnaire
+              <h2 className="text-base sm:text-lg font-extrabold tracking-tight">
+                AI Impact Questionnaire for Teaching Staff (21 Questions)
               </h2>
-              <p className="text-xs text-slate-500 font-medium">
-                21 Questions • Step {currentStep} of 5 • Confidential Study
+              <p className="text-xs text-slate-300">
+                Step {currentStep} of 5 • Confidential Academic Survey
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-700 rounded-2xl hover:bg-slate-100 transition"
+            className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
@@ -336,10 +350,10 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
 
         {/* Edit Banner if editing existing response */}
         {isEditing && (
-          <div className="bg-emerald-50 border-b border-emerald-200/80 px-6 sm:px-8 py-2.5 flex items-center justify-between text-xs font-bold text-emerald-800">
+          <div className="bg-emerald-50 border-b border-emerald-100 px-5 sm:px-8 py-2 flex items-center justify-between text-xs font-bold text-emerald-800">
             <div className="flex items-center gap-2">
-              <Edit3 className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>Editing Previously Saved Questionnaire ({existingResponseId})</span>
+              <Edit3 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span>Editing Previously Saved Response ({existingResponseId})</span>
             </div>
             <span className="hidden sm:inline-block text-[10px] bg-emerald-200/60 text-emerald-900 px-2.5 py-0.5 rounded-full">
               Single Account Sync
@@ -347,34 +361,29 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
           </div>
         )}
 
-        {/* Visual Stepper Bar */}
-        <div className="bg-white px-4 sm:px-8 py-3 border-b border-slate-200/80 shrink-0">
-          <div className="grid grid-cols-5 gap-1.5 text-center">
-            {stepsList.map((st) => {
-              const isCurrent = currentStep === st.id;
-              const isDone = st.id < currentStep;
-              return (
-                <button
-                  key={st.id}
-                  type="button"
-                  onClick={() => {
-                    if (isDone || validateStep(currentStep)) {
-                      setCurrentStep(st.id);
-                    }
-                  }}
-                  className={`py-2 px-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition flex items-center justify-center gap-1.5 ${
-                    isCurrent
-                      ? "bg-blue-600 text-white shadow-md shadow-blue-600/20"
-                      : isDone
-                      ? "bg-blue-50 text-blue-700 border border-blue-100"
-                      : "bg-slate-100 text-slate-500 hover:bg-slate-200"
-                  }`}
-                >
-                  {isDone ? <Check className="w-3 h-3 text-blue-600 shrink-0" /> : null}
-                  <span className="truncate">{st.label}</span>
-                </button>
-              );
-            })}
+        {/* Progress Step Bar */}
+        <div className="bg-slate-100 px-4 sm:px-8 py-3 border-b border-slate-200 shrink-0">
+          <div className="grid grid-cols-5 gap-1 text-center">
+            {stepsList.map((st) => (
+              <button
+                key={st.id}
+                type="button"
+                onClick={() => {
+                  if (st.id < currentStep || validateStep(currentStep)) {
+                    setCurrentStep(st.id);
+                  }
+                }}
+                className={`py-1.5 px-1 rounded-xl text-[10px] sm:text-xs font-bold transition truncate ${
+                  currentStep === st.id
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : st.id < currentStep
+                    ? "bg-blue-100 text-blue-800"
+                    : "bg-slate-200/60 text-slate-500 hover:bg-slate-200"
+                }`}
+              >
+                {st.label}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -401,93 +410,89 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
               {/* STEP 1: SECTION A – STAFF PROFILE */}
               {currentStep === 1 && (
                 <div className="space-y-5 animate-fade-in">
-                  <div className="pb-3 border-b border-slate-200/60">
-                    <span className="px-3 py-1 rounded-lg text-xs font-extrabold bg-blue-50 text-blue-700 border border-blue-100 inline-block mb-1.5">
-                      SECTION A
-                    </span>
-                    <h3 className="text-lg font-extrabold text-slate-900">
-                      Staff Background Profile
+                  <div className="pb-2 border-b border-slate-100">
+                    <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                      <GraduationCap className="w-5 h-5 text-blue-600" />
+                      <span>SECTION A – STAFF PROFILE</span>
                     </h3>
-                    <p className="text-xs text-slate-500">Select your background teaching profile details from the dropdowns below.</p>
+                    <p className="text-xs text-slate-500">Select your profile details from the dropdown options below.</p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Q1: Age Group */}
-                    <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm space-y-2">
-                      <label className="block text-xs sm:text-sm font-bold text-slate-800">
-                        1. What is your age group? <span className="text-blue-600">*</span>
-                      </label>
-                      <select
-                        value={q1AgeGroup}
-                        onChange={(e) => setQ1AgeGroup(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition cursor-pointer"
-                      >
-                        <option value="" disabled>-- Select Age Group --</option>
-                        <option value="Below 30">Below 30</option>
-                        <option value="31–40">31–40</option>
-                        <option value="41–50">41–50</option>
-                        <option value="Above 50">Above 50</option>
-                      </select>
-                    </div>
+                  {/* Q1: Age Group */}
+                  <div className="space-y-2">
+                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
+                      1. What is your age group? *
+                    </label>
+                    <select
+                      value={q1AgeGroup}
+                      onChange={(e) => setQ1AgeGroup(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm cursor-pointer"
+                    >
+                      <option value="" disabled>-- Select Age Group --</option>
+                      <option value="Below 30">Below 30</option>
+                      <option value="31–40">31–40</option>
+                      <option value="41–50">41–50</option>
+                      <option value="Above 50">Above 50</option>
+                    </select>
+                  </div>
 
-                    {/* Q2: Teaching Experience */}
-                    <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm space-y-2">
-                      <label className="block text-xs sm:text-sm font-bold text-slate-800">
-                        2. Teaching experience? <span className="text-blue-600">*</span>
-                      </label>
-                      <select
-                        value={q2Experience}
-                        onChange={(e) => setQ2Experience(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition cursor-pointer"
-                      >
-                        <option value="" disabled>-- Select Teaching Experience --</option>
-                        <option value="Below 5 Years">Below 5 Years</option>
-                        <option value="5–10 Years">5–10 Years</option>
-                        <option value="11–15 Years">11–15 Years</option>
-                        <option value="16–20 Years">16–20 Years</option>
-                        <option value="Above 20 Years">Above 20 Years</option>
-                      </select>
-                    </div>
+                  {/* Q2: Teaching Experience */}
+                  <div className="space-y-2">
+                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
+                      2. What is your teaching experience? *
+                    </label>
+                    <select
+                      value={q2Experience}
+                      onChange={(e) => setQ2Experience(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm cursor-pointer"
+                    >
+                      <option value="" disabled>-- Select Teaching Experience --</option>
+                      <option value="Below 5 Years">Below 5 Years</option>
+                      <option value="5–10 Years">5–10 Years</option>
+                      <option value="11–15 Years">11–15 Years</option>
+                      <option value="16–20 Years">16–20 Years</option>
+                      <option value="Above 20 Years">Above 20 Years</option>
+                    </select>
+                  </div>
 
-                    {/* Q3: Highest Educational Qualification */}
-                    <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm space-y-2">
-                      <label className="block text-xs sm:text-sm font-bold text-slate-800">
-                        3. Educational qualification? <span className="text-blue-600">*</span>
-                      </label>
-                      <select
-                        value={q3Qualification}
-                        onChange={(e) => setQ3Qualification(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition cursor-pointer"
-                      >
-                        <option value="" disabled>-- Select Qualification --</option>
-                        <option value="Master’s Degree">Master’s Degree</option>
-                        <option value="M.Phil.">M.Phil.</option>
-                        <option value="Ph.D.">Ph.D.</option>
-                        <option value="Other">Other</option>
-                      </select>
-                    </div>
+                  {/* Q3: Highest Educational Qualification */}
+                  <div className="space-y-2">
+                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
+                      3. What is your highest educational qualification? *
+                    </label>
+                    <select
+                      value={q3Qualification}
+                      onChange={(e) => setQ3Qualification(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm cursor-pointer"
+                    >
+                      <option value="" disabled>-- Select Educational Qualification --</option>
+                      <option value="Master’s Degree">Master’s Degree</option>
+                      <option value="M.Phil.">M.Phil.</option>
+                      <option value="Ph.D.">Ph.D.</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
 
-                    {/* Q4: AI Workshop / Training */}
-                    <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm space-y-2">
-                      <label className="block text-xs sm:text-sm font-bold text-slate-800">
-                        4. Attended AI workshop/training? <span className="text-blue-600">*</span>
-                      </label>
-                      <select
-                        value={q4Workshop}
-                        onChange={(e) => setQ4Workshop(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition cursor-pointer"
-                      >
-                        <option value="" disabled>-- Select Yes / No --</option>
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                      </select>
-                    </div>
+                  {/* Q4: AI Workshop / Training */}
+                  <div className="space-y-2">
+                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
+                      4. Have you attended any AI-related workshop or training? *
+                    </label>
+                    <select
+                      value={q4Workshop}
+                      onChange={(e) => setQ4Workshop(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm cursor-pointer"
+                    >
+                      <option value="" disabled>-- Select Option --</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
                   </div>
 
                   {/* Q5: Name of Affiliated College */}
-                  <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm space-y-2">
+                  <div className="space-y-2">
                     <label className="block text-xs sm:text-sm font-bold text-slate-800">
-                      5. Name of the Affiliated College <span className="text-blue-600">*</span>
+                      5. Name of the Affiliated College *
                     </label>
                     <div className="relative">
                       <Building2 className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
@@ -496,7 +501,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                         value={q5College}
                         onChange={(e) => setQ5College(e.target.value)}
                         placeholder="Enter your college name (e.g. Government Degree College)"
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm"
                       />
                     </div>
                   </div>
@@ -506,14 +511,11 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
               {/* STEP 2: SECTION B – AI AWARENESS & USAGE */}
               {currentStep === 2 && (
                 <div className="space-y-5 animate-fade-in">
-                  <div className="pb-3 border-b border-slate-200/60">
-                    <span className="px-3 py-1 rounded-lg text-xs font-extrabold bg-blue-50 text-blue-700 border border-blue-100 inline-block mb-1.5">
-                      SECTION B
-                    </span>
-                    <h3 className="text-lg font-extrabold text-slate-900">
-                      AI Awareness & Usage
+                  <div className="pb-2 border-b border-slate-100">
+                    <h3 className="text-base font-extrabold text-slate-900">
+                      SECTION B – AI AWARENESS & USAGE
                     </h3>
-                    <p className="text-xs text-slate-500">Select your agreement rating dropdown for each awareness statement below.</p>
+                    <p className="text-xs text-slate-500">Select your agreement rating dropdown for each statement.</p>
                   </div>
                   {renderLikertGroupDropdown(sectionBQuestions)}
                 </div>
@@ -522,14 +524,11 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
               {/* STEP 3: SECTION C – IMPACT ON TEACHING */}
               {currentStep === 3 && (
                 <div className="space-y-5 animate-fade-in">
-                  <div className="pb-3 border-b border-slate-200/60">
-                    <span className="px-3 py-1 rounded-lg text-xs font-extrabold bg-blue-50 text-blue-700 border border-blue-100 inline-block mb-1.5">
-                      SECTION C
-                    </span>
-                    <h3 className="text-lg font-extrabold text-slate-900">
-                      Impact on Teaching Effectiveness
+                  <div className="pb-2 border-b border-slate-100">
+                    <h3 className="text-base font-extrabold text-slate-900">
+                      SECTION C – IMPACT ON TEACHING
                     </h3>
-                    <p className="text-xs text-slate-500">Select your agreement rating dropdown regarding teaching impact.</p>
+                    <p className="text-xs text-slate-500">Select your agreement rating dropdown regarding teaching effectiveness.</p>
                   </div>
                   {renderLikertGroupDropdown(sectionCQuestions)}
                 </div>
@@ -538,12 +537,9 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
               {/* STEP 4: SECTION D – IMPACT ON STUDENT LEARNING */}
               {currentStep === 4 && (
                 <div className="space-y-5 animate-fade-in">
-                  <div className="pb-3 border-b border-slate-200/60">
-                    <span className="px-3 py-1 rounded-lg text-xs font-extrabold bg-blue-50 text-blue-700 border border-blue-100 inline-block mb-1.5">
-                      SECTION D
-                    </span>
-                    <h3 className="text-lg font-extrabold text-slate-900">
-                      Impact on Student Learning
+                  <div className="pb-2 border-b border-slate-100">
+                    <h3 className="text-base font-extrabold text-slate-900">
+                      SECTION D – IMPACT ON STUDENT LEARNING
                     </h3>
                     <p className="text-xs text-slate-500">Select your agreement rating dropdown regarding student learning outcomes.</p>
                   </div>
@@ -554,26 +550,23 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
               {/* STEP 5: SECTION E – BENEFITS, CHALLENGES & ETHICS */}
               {currentStep === 5 && (
                 <div className="space-y-5 animate-fade-in">
-                  <div className="pb-3 border-b border-slate-200/60">
-                    <span className="px-3 py-1 rounded-lg text-xs font-extrabold bg-blue-50 text-blue-700 border border-blue-100 inline-block mb-1.5">
-                      SECTION E
-                    </span>
-                    <h3 className="text-lg font-extrabold text-slate-900">
-                      Benefits, Challenges & Ethics
+                  <div className="pb-2 border-b border-slate-100">
+                    <h3 className="text-base font-extrabold text-slate-900">
+                      SECTION E – BENEFITS, CHALLENGES & ETHICS
                     </h3>
-                    <p className="text-xs text-slate-500">Select your agreement rating dropdown regarding productivity and guidelines.</p>
+                    <p className="text-xs text-slate-500">Select your agreement rating dropdown regarding productivity and ethics.</p>
                   </div>
                   {renderLikertGroupDropdown(sectionEQuestions)}
                 </div>
               )}
 
               {/* Wizard Bottom Navigation Bar */}
-              <div className="pt-4 border-t border-slate-200/80 flex justify-between items-center gap-3">
+              <div className="pt-4 border-t border-slate-200 flex justify-between items-center gap-3">
                 {currentStep > 1 ? (
                   <button
                     type="button"
                     onClick={() => setCurrentStep(prev => prev - 1)}
-                    className="px-5 py-2.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold rounded-xl text-xs flex items-center gap-1.5 transition shadow-sm"
+                    className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs flex items-center gap-1 transition"
                   >
                     <ChevronLeft className="w-4 h-4" />
                     <span>Previous</span>
@@ -584,7 +577,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                   <button
                     type="button"
                     onClick={handleNextStep}
-                    className="px-7 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-md shadow-blue-600/20 flex items-center gap-1.5 transition"
+                    className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-md flex items-center gap-1.5 transition"
                   >
                     <span>Next Step</span>
                     <ChevronRight className="w-4 h-4" />
@@ -592,7 +585,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                 ) : (
                   <button
                     type="submit"
-                    className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-lg shadow-emerald-600/30 flex items-center gap-2 transition"
+                    className="px-7 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-lg flex items-center gap-2 transition"
                   >
                     <Send className="w-4 h-4" />
                     <span>{isEditing ? "Update Saved Questionnaire" : "Submit 21-Question Survey"}</span>
@@ -603,7 +596,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
             </form>
           ) : (
             /* Celebration Success Screen */
-            <div className="py-12 text-center space-y-4 max-w-md mx-auto">
+            <div className="py-10 text-center space-y-4 max-w-md mx-auto">
               <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto shadow-md">
                 <CheckCircle className="w-10 h-10" />
               </div>
