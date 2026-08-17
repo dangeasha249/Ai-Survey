@@ -11,7 +11,9 @@ import {
   Users,
   MapPin,
   ClipboardList,
-  Database
+  Database,
+  GraduationCap,
+  ChevronRight,
 } from "lucide-react";
 
 interface HeroSectionProps {
@@ -111,16 +113,113 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
           </div>
 
-          {/* Right Column Graphic / Artwork (Desktop Only) */}
-          <div className="hidden lg:flex lg:col-span-6 justify-center items-center">
-            <Image
-              src="/images/landing-page.png"
-              alt="AI Tools in Education Illustration"
-              width={600}
-              height={480}
-              className="w-full max-w-lg lg:max-w-none h-auto object-contain"
-              priority
-            />
+          {/* Right Column Floating Interactive Survey Form Card */}
+          <div className="lg:col-span-6 flex justify-center items-center relative">
+            
+            {/* Background Ambient Glow */}
+            <div className="absolute -inset-4 bg-gradient-to-tr from-blue-500/20 to-sky-400/20 rounded-[40px] blur-2xl -z-10 pointer-events-none" />
+
+            {/* Floating Survey Form Card */}
+            <div className="w-full max-w-lg bg-white rounded-3xl p-6 sm:p-7 shadow-2xl border border-blue-100/90 relative overflow-hidden animate-fade-in space-y-4">
+              
+              {/* Card Header */}
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-600/30">
+                    <GraduationCap className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-extrabold text-slate-900 leading-tight">
+                      Faculty AI Impact Questionnaire
+                    </h3>
+                    <p className="text-xs font-medium text-slate-500">
+                      21 Questions • 5 Sections
+                    </p>
+                  </div>
+                </div>
+
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/70">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Live Form</span>
+                </span>
+              </div>
+
+              {/* Quick Dropdown Form Fields */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+                  <span>SECTION A – STAFF PROFILE</span>
+                  <span className="text-blue-600 font-extrabold">Step 1 of 5</span>
+                </div>
+
+                {/* Field 1: Age Group */}
+                <div className="space-y-1 text-left">
+                  <label className="block text-xs font-bold text-slate-700">
+                    1. What is your age group? *
+                  </label>
+                  <select
+                    onClick={onStartSurvey}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-800 focus:outline-none cursor-pointer hover:border-blue-300 transition"
+                  >
+                    <option>-- Select Age Group --</option>
+                    <option>Below 30</option>
+                    <option>31–40</option>
+                    <option>41–50</option>
+                    <option>Above 50</option>
+                  </select>
+                </div>
+
+                {/* Field 2: Teaching Experience */}
+                <div className="space-y-1 text-left">
+                  <label className="block text-xs font-bold text-slate-700">
+                    2. What is your teaching experience? *
+                  </label>
+                  <select
+                    onClick={onStartSurvey}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-800 focus:outline-none cursor-pointer hover:border-blue-300 transition"
+                  >
+                    <option>-- Select Teaching Experience --</option>
+                    <option>Below 5 Years</option>
+                    <option>5–10 Years</option>
+                    <option>11–15 Years</option>
+                    <option>16–20 Years</option>
+                    <option>Above 20 Years</option>
+                  </select>
+                </div>
+
+                {/* Field 3: Highest Qualification */}
+                <div className="space-y-1 text-left">
+                  <label className="block text-xs font-bold text-slate-700">
+                    3. Highest Educational Qualification *
+                  </label>
+                  <select
+                    onClick={onStartSurvey}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-800 focus:outline-none cursor-pointer hover:border-blue-300 transition"
+                  >
+                    <option>-- Select Qualification --</option>
+                    <option>Master’s Degree</option>
+                    <option>M.Phil.</option>
+                    <option>Ph.D.</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <button
+                onClick={onStartSurvey}
+                className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition active:scale-95"
+              >
+                <FileEdit className="w-4 h-4" />
+                <span>Open 21-Question Survey Form</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+
+              <p className="text-[11px] text-center text-slate-400 font-medium pt-1">
+                🔒 100% Confidential • Academic Research Study
+              </p>
+
+            </div>
+
           </div>
 
         </div>
