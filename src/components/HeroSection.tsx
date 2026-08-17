@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import {
   FileEdit,
   Info,
@@ -49,18 +48,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
           {/* Left Column Text Content */}
           <div className="lg:col-span-6 space-y-5 sm:space-y-6">
-
-            {/* Mobile View Image (Appears First at Top on Mobile View) */}
-            <div className="block lg:hidden py-1 flex justify-center">
-              <Image
-                src="/images/landing-page.png"
-                alt="AI Tools in Education Illustration"
-                width={400}
-                height={320}
-                className="w-full max-w-xs sm:max-w-md h-auto object-contain"
-                priority
-              />
-            </div>
 
             <div className="space-y-2 sm:space-y-3">
               <h1 className="text-xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
