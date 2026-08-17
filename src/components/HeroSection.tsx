@@ -115,13 +115,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
           {/* Right Column Floating Interactive Survey Form Card */}
           <div className="lg:col-span-6 flex justify-center items-center relative">
-            
+
             {/* Background Ambient Glow */}
             <div className="absolute -inset-4 bg-gradient-to-tr from-blue-500/20 to-sky-400/20 rounded-[40px] blur-2xl -z-10 pointer-events-none" />
 
             {/* Floating Survey Form Card */}
             <div className="w-full max-w-lg bg-white rounded-3xl p-6 sm:p-7 shadow-2xl border border-blue-100/90 relative overflow-hidden animate-fade-in space-y-4">
-              
+
               {/* Card Header */}
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2.5">
@@ -138,10 +138,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   </div>
                 </div>
 
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/70">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>Live Form</span>
-                </span>
+
               </div>
 
               {/* Quick Dropdown Form Fields */}
@@ -157,6 +154,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     1. What is your age group? *
                   </label>
                   <select
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      onStartSurvey();
+                    }}
                     onClick={onStartSurvey}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-800 focus:outline-none cursor-pointer hover:border-blue-300 transition"
                   >
@@ -174,6 +175,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     2. What is your teaching experience? *
                   </label>
                   <select
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      onStartSurvey();
+                    }}
                     onClick={onStartSurvey}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-800 focus:outline-none cursor-pointer hover:border-blue-300 transition"
                   >
@@ -192,6 +197,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     3. Highest Educational Qualification *
                   </label>
                   <select
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      onStartSurvey();
+                    }}
                     onClick={onStartSurvey}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-800 focus:outline-none cursor-pointer hover:border-blue-300 transition"
                   >
@@ -215,7 +224,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               </button>
 
               <p className="text-[11px] text-center text-slate-400 font-medium pt-1">
-                🔒 100% Confidential • Academic Research Study
+                100% Confidential • Academic Research Study
               </p>
 
             </div>
