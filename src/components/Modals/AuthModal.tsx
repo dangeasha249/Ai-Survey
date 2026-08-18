@@ -111,20 +111,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   const handleGoogleAuth = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      const googleUser = {
-        id: `google-${Date.now()}`,
-        name: "Student (Google User)",
-        email: "student.google@gmail.com",
-        role: "Student",
-        institution: "Higher Education Institute",
-        department: "Computer Science & IT",
-      };
-      onAuthSuccess(googleUser);
-      onClose();
-    }, 600);
+    // Redirect to backend Google OAuth initiation route
+    window.location.href = "/api/auth/google";
   };
 
   const GoogleIcon = () => (

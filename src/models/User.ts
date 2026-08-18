@@ -18,7 +18,7 @@ const UserSchema: Schema = new Schema(
   {
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    password: { type: String, required: true },
+    password: { type: String, required: false, default: undefined },
     role: { type: String, enum: ["Researcher", "Student"], default: "Student" },
     institution: { type: String, default: "University of Mumbai / Higher Education Cell" },
     department: { type: String, default: "Department of Computer Science" },
