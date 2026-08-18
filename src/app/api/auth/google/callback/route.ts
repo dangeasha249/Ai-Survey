@@ -3,6 +3,8 @@ import { connectToDatabase } from "@/lib/mongodb";
 import UserModel from "@/models/User";
 import { createSession, setSessionCookie } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: Request) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const clientId = process.env.GOOGLE_CLIENT_ID;
