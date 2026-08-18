@@ -82,10 +82,11 @@ export async function GET(request: Request) {
 
     setSessionCookie(sessionToken);
 
+    const isHttps = appUrl.startsWith("https://");
     const response = NextResponse.redirect(`${appUrl}/`);
     response.cookies.set("aiedu_session", sessionToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: isHttps,
       sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 8,
