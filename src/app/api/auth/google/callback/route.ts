@@ -80,8 +80,16 @@ export async function GET(request: Request) {
       role: user.role,
     });
 
-    const response = NextResponse.redirect(`${appUrl}/`);
     setSessionCookie(sessionToken);
+
+    const response = NextResponse.redirect(`${appUrl}/`);
+    response.cookies.set("aiedu_session", sessionToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 8,
+    });
 
     return response;
   } catch (error) {
