@@ -75,17 +75,17 @@ function SurveyPageContent() {
                   AI Impact Survey for Teaching Staff
                 </h1>
                 <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
-                  Your account is verified. Click below to launch the 21-question questionnaire form.
+                  Your account is verified. Click below to launch the 25-question questionnaire form.
                 </p>
               </div>
 
               <div className="pt-2">
                 <button
                   onClick={() => setIsSurveyOpen(true)}
-                  className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-md flex items-center justify-center gap-2 transition"
+                  className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition active:scale-95"
                 >
                   <FileEdit className="w-4 h-4" />
-                  <span>Start 21-Question Survey</span>
+                  <span>Start 25-Question Survey</span>
                 </button>
               </div>
             </>

@@ -130,7 +130,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                       Faculty AI Impact Questionnaire
                     </h3>
                     <p className="text-xs font-medium text-slate-500">
-                      21 Questions • 5 Sections
+                      25 Questions • 5 Sections
                     </p>
                   </div>
                 </div>
@@ -216,7 +216,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition active:scale-95"
               >
                 <FileEdit className="w-4 h-4" />
-                <span>Open 21-Question Survey Form</span>
+                <span>Open 25-Question Survey Form</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
 

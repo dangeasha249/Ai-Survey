@@ -55,7 +55,7 @@ export const InfoSections: React.FC<InfoSectionsProps> = ({
     },
     {
       q: "How long does it take to fill out the questionnaire?",
-      a: "The questionnaire comprises 21 structured questions across 5 sections (A through E) and takes approximately 5 to 7 minutes to complete."
+      a: "The questionnaire comprises 25 structured questions across 5 sections (A through E) and takes approximately 5 to 7 minutes to complete."
     },
   ];
 
