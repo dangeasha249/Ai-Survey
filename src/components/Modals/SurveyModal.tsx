@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, CheckCircle, Send, ChevronRight, ChevronLeft, Lock, Edit3, LogIn, GraduationCap, Building2, HelpCircle } from "lucide-react";
+import { X, CheckCircle, Send, ChevronRight, ChevronLeft, Lock, Edit3, GraduationCap, Building2, HelpCircle } from "lucide-react";
 import confetti from "canvas-confetti";
 import { useSurvey } from "@/context/SurveyContext";
 import { useAuth } from "@/context/AuthContext";
@@ -30,17 +30,140 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
   // Edit response state
   const [isEditing, setIsEditing] = useState(false);
   const [existingResponseId, setExistingResponseId] = useState<string | null>(null);
-  const [loadingExisting, setLoadingExisting] = useState(false);
+  const [, setLoadingExisting] = useState(false);
 
-  // SECTION A – STAFF PROFILE (Q1 - Q5)
+  // SECTION A – STAFF PROFILE (Q1 - Q5) [KEPT AS IS]
   const [q1AgeGroup, setQ1AgeGroup] = useState("");
   const [q2Experience, setQ2Experience] = useState("");
   const [q3Qualification, setQ3Qualification] = useState("");
   const [q4Workshop, setQ4Workshop] = useState("");
   const [q5College, setQ5College] = useState("");
 
-  // SECTIONS B, C, D, E – LIKERT RATINGS 1..5 (Q6 - Q21)
-  const [likertRatings, setLikertRatings] = useState<Record<string, number>>({});
+  // SECTIONS B, C, D, E – MULTIPLE CHOICE ANSWERS (Q6 - Q25)
+  const [mcqAnswers, setMcqAnswers] = useState<Record<string, string>>({});
+
+  // Question Definitions for B, C, D, E
+  const sectionBQuestions = [
+    {
+      key: "q6",
+      text: "6. Are you aware of Artificial Intelligence (AI) tools used in education?",
+      options: ["Yes", "No", "Somewhat"],
+    },
+    {
+      key: "q7",
+      text: "7. Which AI tool do you use most frequently for teaching?",
+      options: ["ChatGPT", "Google Gemini", "Microsoft Copilot", "Grammarly", "QuillBot", "Perplexity AI"],
+    },
+    {
+      key: "q8",
+      text: "8. For which teaching activity do you mainly use AI tools?",
+      options: [
+        "Preparing lecture content",
+        "Creating question papers/quizzes",
+        "Preparing presentations",
+        "Generating examples and explanations",
+      ],
+    },
+    {
+      key: "q9",
+      text: "9. How would you rate your knowledge of AI tools?",
+      options: ["Excellent", "Good", "Average", "Poor"],
+    },
+    {
+      key: "q10",
+      text: "10. Do you use AI tools to prepare teaching materials?",
+      options: ["Frequently", "Sometimes", "Rarely", "Never"],
+    },
+  ];
+
+  const sectionCQuestions = [
+    {
+      key: "q11",
+      text: "11. To what extent have AI tools improved your teaching effectiveness?",
+      options: ["To a great extent", "To a moderate extent", "To a small extent", "Not at all"],
+    },
+    {
+      key: "q12",
+      text: "12. Overall, what is the impact of AI tools on your teaching?",
+      options: ["Highly positive", "Positive", "Neutral", "Negative", "Highly negative"],
+    },
+    {
+      key: "q13",
+      text: "13. Have AI tools helped you create better teaching materials?",
+      options: ["Significantly", "Moderately", "Slightly", "Not at all"],
+    },
+    {
+      key: "q14",
+      text: "14. How useful are AI tools for generating assignments, quizzes, and assessment materials?",
+      options: ["Very useful", "Useful", "Slightly useful", "Not useful"],
+    },
+    {
+      key: "q15",
+      text: "15. How have AI tools affected your lesson preparation time?",
+      options: ["Significantly reduced", "Moderately reduced", "Slightly reduced", "No change"],
+    },
+  ];
+
+  const sectionDQuestions = [
+    {
+      key: "q16",
+      text: "16. Do AI tools help you complete academic assignments more effectively?",
+      options: ["Always", "Often", "Sometimes", "Never"],
+    },
+    {
+      key: "q17",
+      text: "17. How frequently do you use AI tools for your learning activities?",
+      options: ["Daily", "Several times a week", "Occasionally", "Never"],
+    },
+    {
+      key: "q18",
+      text: "18. How useful are AI tools for exam preparation?",
+      options: ["Very useful", "Useful", "Slightly useful", "Not useful"],
+    },
+    {
+      key: "q19",
+      text: "19. Do AI tools help you personalize your learning according to your needs?",
+      options: ["To a great extent", "To a moderate extent", "To a small extent", "Not at all"],
+    },
+    {
+      key: "q20",
+      text: "20. What is the major benefit of using AI tools for your learning?",
+      options: [
+        "Quick access to information",
+        "Better understanding of concepts",
+        "Personalized learning support",
+        "Faster completion of academic work",
+      ],
+    },
+    {
+      key: "q21",
+      text: "21. Overall, what is the impact of AI tools on your learning?",
+      options: ["Highly positive", "Positive", "Neutral", "Negative", "Highly negative"],
+    },
+  ];
+
+  const sectionEQuestions = [
+    {
+      key: "q22",
+      text: "22. What is the major benefit of using AI tools in higher education?",
+      options: ["Quick access to information", "Personalized learning", "Saving time", "All of the above"],
+    },
+    {
+      key: "q23",
+      text: "23. How do AI tools help students in their academic work?",
+      options: ["Improve understanding", "Generate ideas", "Provide instant feedback", "All of the above"],
+    },
+    {
+      key: "q24",
+      text: "24. How do AI tools help teachers in their teaching activities?",
+      options: ["Reduce preparation time", "Create teaching materials", "Prepare assessments", "All of the above"],
+    },
+    {
+      key: "q25",
+      text: "25. How useful are AI tools for personalized learning?",
+      options: ["Very useful", "Useful", "Slightly useful", "Not useful"],
+    },
+  ];
 
   // Fetch existing survey if user is logged in & reset state on open
   useEffect(() => {
@@ -48,7 +171,6 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
 
     async function checkUserSurvey() {
       if (isOpen) {
-        // Reset all form state to clean empty defaults on modal open
         setIsEditing(false);
         setExistingResponseId(null);
         setSubmitted(false);
@@ -60,7 +182,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
         setQ3Qualification("");
         setQ4Workshop("");
         setQ5College("");
-        setLikertRatings({});
+        setMcqAnswers({});
 
         if (isAuthenticated && user?.email) {
           setLoadingExisting(true);
@@ -80,7 +202,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                 setQ3Qualification(ans.q3Qualification || ans.staffProfile?.qualification || "");
                 setQ4Workshop(ans.q4Workshop || ans.staffProfile?.workshop || "");
                 setQ5College(ans.q5College || r.course || "");
-                setLikertRatings(ans.likertRatings || {});
+                setMcqAnswers(ans.mcqAnswers || ans.answers || {});
               }
             }
           } catch {
@@ -113,14 +235,14 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
 
   const stepsList = [
     { id: 1, label: "A. Staff Profile" },
-    { id: 2, label: "B. AI Awareness & Usage" },
+    { id: 2, label: "B. Awareness & Usage" },
     { id: 3, label: "C. Impact on Teaching" },
     { id: 4, label: "D. Student Learning" },
-    { id: 5, label: "E. Benefits & Ethics" },
+    { id: 5, label: "E. Higher Education" },
   ];
 
-  const handleLikertChange = (key: string, val: number) => {
-    setLikertRatings(prev => ({ ...prev, [key]: val }));
+  const handleMcqChange = (key: string, val: string) => {
+    setMcqAnswers((prev) => ({ ...prev, [key]: val }));
   };
 
   // Step Validation
@@ -128,35 +250,35 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
     setSectionError(null);
     if (step === 1) {
       if (!q1AgeGroup || !q2Experience || !q3Qualification || !q4Workshop || !q5College.trim()) {
-        setSectionError("Please answer all 5 Staff Profile dropdown fields before continuing.");
+        setSectionError("Please answer all 5 Staff Profile fields before continuing.");
         return false;
       }
     } else if (step === 2) {
-      const keys = ["q6", "q7", "q8", "q9"];
-      const missing = keys.filter(k => !likertRatings[k]);
+      const keys = ["q6", "q7", "q8", "q9", "q10"];
+      const missing = keys.filter((k) => !mcqAnswers[k]);
       if (missing.length > 0) {
-        setSectionError("Please select a rating dropdown for all 4 statements in Section B.");
+        setSectionError("Please answer all 5 questions in Section B.");
         return false;
       }
     } else if (step === 3) {
-      const keys = ["q10", "q11", "q12", "q13", "q14"];
-      const missing = keys.filter(k => !likertRatings[k]);
+      const keys = ["q11", "q12", "q13", "q14", "q15"];
+      const missing = keys.filter((k) => !mcqAnswers[k]);
       if (missing.length > 0) {
-        setSectionError("Please select a rating dropdown for all 5 statements in Section C.");
+        setSectionError("Please answer all 5 questions in Section C.");
         return false;
       }
     } else if (step === 4) {
-      const keys = ["q15", "q16", "q17", "q18"];
-      const missing = keys.filter(k => !likertRatings[k]);
+      const keys = ["q16", "q17", "q18", "q19", "q20", "q21"];
+      const missing = keys.filter((k) => !mcqAnswers[k]);
       if (missing.length > 0) {
-        setSectionError("Please select a rating dropdown for all 4 statements in Section D.");
+        setSectionError("Please answer all 6 questions in Section D.");
         return false;
       }
     } else if (step === 5) {
-      const keys = ["q19", "q20", "q21"];
-      const missing = keys.filter(k => !likertRatings[k]);
+      const keys = ["q22", "q23", "q24", "q25"];
+      const missing = keys.filter((k) => !mcqAnswers[k]);
       if (missing.length > 0) {
-        setSectionError("Please select a rating dropdown for all 3 statements in Section E.");
+        setSectionError("Please answer all 4 questions in Section E.");
         return false;
       }
     }
@@ -165,7 +287,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
 
   const handleNextStep = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(5, prev + 1));
+      setCurrentStep((prev) => Math.min(5, prev + 1));
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
@@ -176,24 +298,21 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
 
     setSubmitError(null);
 
-    // Calculate average impact score (1..5)
-    const likertVals = Object.values(likertRatings);
-    const avgScore = likertVals.length
-      ? Number((likertVals.reduce((a, b) => a + b, 0) / likertVals.length).toFixed(2))
-      : 4;
+    const primaryToolChosen = mcqAnswers["q7"] || "ChatGPT";
+    const usesAiAnswer = mcqAnswers["q6"] === "No" ? "No" : "Yes";
 
     const payload = {
       userEmail: user?.email,
       course: q5College,
-      usesAI: (likertRatings["q8"] && likertRatings["q8"] >= 3) ? "Yes" : "No",
-      primaryTool: "ChatGPT / Gemini / Copilot",
-      impactRating: Math.max(1, Math.min(5, Math.round(avgScore))),
+      usesAI: usesAiAnswer,
+      primaryTool: primaryToolChosen,
+      impactRating: 4,
       q1AgeGroup,
       q2Experience,
       q3Qualification,
       q4Workshop,
       q5College,
-      likertRatings,
+      mcqAnswers,
       staffProfile: {
         ageGroup: q1AgeGroup,
         experience: q2Experience,
@@ -242,13 +361,10 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
 
           <div className="space-y-2">
             <h3 className="text-xl font-extrabold text-slate-900">
-              Faculty Sign In Required
+              Sign In Required
             </h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Please sign in or create a teaching staff account to participate in the AI Impact Questionnaire.
-            </p>
-            <p className="text-[11px] text-slate-400">
-              Each faculty account can submit the survey once and update their saved response anytime.
+              Please sign in with your Google account to participate in the research questionnaire.
             </p>
           </div>
 
@@ -259,60 +375,31 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
             }}
             className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition"
           >
-            <LogIn className="w-4 h-4" />
-            <span>Sign In / Create Account</span>
+            <span>Sign In to Continue</span>
           </button>
         </div>
       </div>
     );
   }
 
-  const sectionBQuestions = [
-    { key: "q6", text: "6. I have sufficient knowledge about Artificial Intelligence and its educational applications." },
-    { key: "q7", text: "7. I am familiar with AI tools such as ChatGPT, Gemini, Copilot and other AI tools." },
-    { key: "q8", text: "8. I regularly use AI tools for academic and teaching-related activities." },
-    { key: "q9", text: "9. I use AI tools for preparing notes, presentations, assignments, quizzes or question papers." },
-  ];
-
-  const sectionCQuestions = [
-    { key: "q10", text: "10. AI tools help me explain difficult concepts more effectively." },
-    { key: "q11", text: "11. AI helps me prepare teaching materials in less time." },
-    { key: "q12", text: "12. AI tools improve the quality and effectiveness of my teaching." },
-    { key: "q13", text: "13. AI makes my classroom teaching more interactive and engaging." },
-    { key: "q14", text: "14. AI helps me provide quick and personalized support to students." },
-  ];
-
-  const sectionDQuestions = [
-    { key: "q15", text: "15. AI tools help students understand difficult concepts more easily." },
-    { key: "q16", text: "16. AI encourages students to learn independently and explore additional resources." },
-    { key: "q17", text: "17. AI improves students’ problem-solving, creativity and critical-thinking skills." },
-    { key: "q18", text: "18. AI can improve students’ academic performance and learning outcomes." },
-  ];
-
-  const sectionEQuestions = [
-    { key: "q19", text: "19. AI reduces teachers’ workload and improves overall productivity." },
-    { key: "q20", text: "20. Overdependence on AI may negatively affect students’ independent thinking and academic integrity." },
-    { key: "q21", text: "21. Colleges should provide AI training and develop clear guidelines for the responsible and ethical use of AI in education." },
-  ];
-
-  const renderLikertGroupDropdown = (questions: { key: string; text: string }[]) => (
-    <div className="space-y-4">
+  const renderMcqGroup = (questions: { key: string; text: string; options: string[] }[]) => (
+    <div className="space-y-5">
       {questions.map((q) => (
-        <div key={q.key} className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 space-y-2.5">
+        <div key={q.key} className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 space-y-3">
           <label className="block text-xs sm:text-sm font-bold text-slate-800 leading-relaxed">
             {q.text} *
           </label>
           <select
-            value={likertRatings[q.key] || ""}
-            onChange={(e) => handleLikertChange(q.key, Number(e.target.value))}
+            value={mcqAnswers[q.key] || ""}
+            onChange={(e) => handleMcqChange(q.key, e.target.value)}
             className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm cursor-pointer"
           >
-            <option value="" disabled>-- Select Your Rating --</option>
-            <option value={5}>5 - Strongly Agree</option>
-            <option value={4}>4 - Agree</option>
-            <option value={3}>3 - Neutral</option>
-            <option value={2}>2 - Disagree</option>
-            <option value={1}>1 - Strongly Disagree</option>
+            <option value="" disabled>-- Select Option --</option>
+            {q.options.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ))}
           </select>
         </div>
       ))}
@@ -330,11 +417,11 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
               <GraduationCap className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-extrabold tracking-tight">
-                AI Impact Questionnaire for Teaching Staff (21 Questions)
+              <h2 className="text-base sm:text-lg font-black tracking-tight">
+                AI Impact Questionnaire
               </h2>
-              <p className="text-xs text-slate-300">
-                Step {currentStep} of 5 • Confidential Academic Survey
+              <p className="text-[11px] text-slate-400">
+                25-Question Academic Study Survey
               </p>
             </div>
           </div>
@@ -507,55 +594,55 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                 </div>
               )}
 
-              {/* STEP 2: SECTION B – AI AWARENESS & USAGE */}
+              {/* STEP 2: SECTION B – AWARENESS AND USE OF AI TOOLS */}
               {currentStep === 2 && (
                 <div className="space-y-5 animate-fade-in">
                   <div className="pb-2 border-b border-slate-100">
                     <h3 className="text-base font-extrabold text-slate-900">
-                      SECTION B – AI AWARENESS & USAGE
+                      SECTION B – AWARENESS AND USE OF AI TOOLS
                     </h3>
-                    <p className="text-xs text-slate-500">Select your agreement rating dropdown for each statement.</p>
+                    <p className="text-xs text-slate-500">Select an option for each question below.</p>
                   </div>
-                  {renderLikertGroupDropdown(sectionBQuestions)}
+                  {renderMcqGroup(sectionBQuestions)}
                 </div>
               )}
 
-              {/* STEP 3: SECTION C – IMPACT ON TEACHING */}
+              {/* STEP 3: SECTION C – IMPACT OF AI TOOLS ON TEACHING */}
               {currentStep === 3 && (
                 <div className="space-y-5 animate-fade-in">
                   <div className="pb-2 border-b border-slate-100">
                     <h3 className="text-base font-extrabold text-slate-900">
-                      SECTION C – IMPACT ON TEACHING
+                      SECTION C – IMPACT OF AI TOOLS ON TEACHING
                     </h3>
-                    <p className="text-xs text-slate-500">Select your agreement rating dropdown regarding teaching effectiveness.</p>
+                    <p className="text-xs text-slate-500">Select an option regarding teaching effectiveness and materials.</p>
                   </div>
-                  {renderLikertGroupDropdown(sectionCQuestions)}
+                  {renderMcqGroup(sectionCQuestions)}
                 </div>
               )}
 
-              {/* STEP 4: SECTION D – IMPACT ON STUDENT LEARNING */}
+              {/* STEP 4: SECTION D – STUDENT LEARNING */}
               {currentStep === 4 && (
                 <div className="space-y-5 animate-fade-in">
                   <div className="pb-2 border-b border-slate-100">
                     <h3 className="text-base font-extrabold text-slate-900">
-                      SECTION D – IMPACT ON STUDENT LEARNING
+                      SECTION D – STUDENT LEARNING
                     </h3>
-                    <p className="text-xs text-slate-500">Select your agreement rating dropdown regarding student learning outcomes.</p>
+                    <p className="text-xs text-slate-500">Select an option regarding student learning and assignments.</p>
                   </div>
-                  {renderLikertGroupDropdown(sectionDQuestions)}
+                  {renderMcqGroup(sectionDQuestions)}
                 </div>
               )}
 
-              {/* STEP 5: SECTION E – BENEFITS, CHALLENGES & ETHICS */}
+              {/* STEP 5: SECTION E – HIGHER EDUCATION */}
               {currentStep === 5 && (
                 <div className="space-y-5 animate-fade-in">
                   <div className="pb-2 border-b border-slate-100">
                     <h3 className="text-base font-extrabold text-slate-900">
-                      SECTION E – BENEFITS, CHALLENGES & ETHICS
+                      SECTION E – HIGHER EDUCATION
                     </h3>
-                    <p className="text-xs text-slate-500">Select your agreement rating dropdown regarding productivity and ethics.</p>
+                    <p className="text-xs text-slate-500">Select an option regarding benefits and application in higher education.</p>
                   </div>
-                  {renderLikertGroupDropdown(sectionEQuestions)}
+                  {renderMcqGroup(sectionEQuestions)}
                 </div>
               )}
 
@@ -564,13 +651,15 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                 {currentStep > 1 ? (
                   <button
                     type="button"
-                    onClick={() => setCurrentStep(prev => prev - 1)}
+                    onClick={() => setCurrentStep((prev) => prev - 1)}
                     className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs flex items-center gap-1 transition"
                   >
                     <ChevronLeft className="w-4 h-4" />
                     <span>Previous</span>
                   </button>
-                ) : <div />}
+                ) : (
+                  <div />
+                )}
 
                 {currentStep < 5 ? (
                   <button
@@ -587,7 +676,7 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
                     className="px-7 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-lg flex items-center gap-2 transition"
                   >
                     <Send className="w-4 h-4" />
-                    <span>{isEditing ? "Update Saved Questionnaire" : "Submit 21-Question Survey"}</span>
+                    <span>{isEditing ? "Update Saved Questionnaire" : "Submit 25-Question Survey"}</span>
                   </button>
                 )}
               </div>
@@ -599,20 +688,24 @@ export const SurveyModal: React.FC<SurveyModalProps> = ({
               <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto shadow-md">
                 <CheckCircle className="w-10 h-10" />
               </div>
-              <h3 className="text-2xl font-extrabold text-slate-900">
-                {isEditing ? "Faculty Survey Updated Successfully!" : "Faculty Survey Submitted Successfully!"}
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                {isEditing
-                  ? "Your teaching staff survey responses have been updated successfully in the MongoDB database."
-                  : "Thank you for completing all 21 questions of the AI Impact Questionnaire for Teaching Staff."}
-              </p>
-              <button
-                onClick={handleReset}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md text-xs transition"
-              >
-                Close Survey Window
-              </button>
+
+              <div className="space-y-2">
+                <h3 className="text-2xl font-extrabold text-slate-900">
+                  {isEditing ? "Response Updated!" : "Survey Submitted Successfully!"}
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Thank you for participating in our research study. Your responses have been securely stored in our research dataset.
+                </p>
+              </div>
+
+              <div className="pt-4">
+                <button
+                  onClick={handleReset}
+                  className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs shadow-md transition"
+                >
+                  Close Window
+                </button>
+              </div>
             </div>
           )}
 
